@@ -1,0 +1,17 @@
+version: '3.8'
+
+volumes:
+  turbomeet_postgres:
+
+services:
+  turbomeet_postgres:
+    container_name: turbomeet_postgres
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=turbomeet
+      - POSTGRES_USER=turbomeet
+      - POSTGRES_PASSWORD=turbomeet
+    volumes:
+      - turbomeet_postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
