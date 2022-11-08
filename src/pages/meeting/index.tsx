@@ -1,17 +1,17 @@
-import { Button } from '@/components/ui/button';
-import { Form, useZodForm } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { trpc } from '@/utils/trpc';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { date, z } from 'zod';
+import { Button } from '../../components/ui/button';
+import { Form, useZodForm } from '../../components/ui/form';
+import { Input } from '../../components/ui/input';
+import { trpc } from '../../utils/trpc';
 
 const Dashboard: NextPage = () => {
   const {
     mutate: createMeeting,
     data,
     error,
-  } = trpc.useMutation(['meeting-public.create'], {
+  } = trpc.meetingPublic.create.useMutation({
     onSuccess: () => {
       form.reset();
     },
@@ -35,8 +35,8 @@ const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Meeting</title>
-        <meta name="description" content="mapper | Meeting" />
+        <title>turbomeet | Meeting</title>
+        <meta name="description" content="turbomeet | Meeting" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
 import type { NextPage } from 'next';
 import { signOut, useSession } from 'next-auth/react';
 import Head from 'next/head';
 import Image from 'next/image';
+import { Button } from '../components/ui/button';
 
 const Profile: NextPage = () => {
   const { data: session } = useSession();
@@ -10,8 +10,8 @@ const Profile: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Profile</title>
-        <meta name="description" content="mapper | Profile" />
+        <title>turbomeet | Profile</title>
+        <meta name="description" content="turbomeet | Profile" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

@@ -8,8 +8,8 @@ const Login: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Login</title>
-        <meta name="description" content="mapper | Login" />
+        <title>turbomeet | Login</title>
+        <meta name="description" content="turbomeet | Login" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

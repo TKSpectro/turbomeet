@@ -1,8 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Form, useZodForm } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Loading } from '@/components/ui/loading';
-import { trpc } from '@/utils/trpc';
 import autoAnimate from '@formkit/auto-animate';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
@@ -12,21 +7,26 @@ import Head from 'next/head';
 import { useEffect, useRef } from 'react';
 import { HiOutlineCheckCircle, HiOutlineMinusCircle, HiOutlineTrash } from 'react-icons/hi';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Form, useZodForm } from '../components/ui/form';
+import { Input } from '../components/ui/input';
+import { Loading } from '../components/ui/loading';
+import { trpc } from '../utils/trpc';
 
 dayjs.extend(relativeTime);
 
 const Todo: NextPage = () => {
-  const { data: todos, isLoading, refetch: refetchTodos } = trpc.useQuery(['todo.getAll']);
+  const { data: todos, isLoading, refetch: refetchTodos } = trpc.todo.getAll.useQuery();
 
-  const { mutate: addTodo } = trpc.useMutation(['todo.create'], {
+  const { mutate: addTodo } = trpc.todo.create.useMutation({
     onSuccess: () => refetchTodos(),
   });
 
-  const { mutate: removeTodo } = trpc.useMutation(['todo.remove'], {
+  const { mutate: removeTodo } = trpc.todo.remove.useMutation({
     onSuccess: () => refetchTodos(),
   });
 
-  const { mutate: completeTodo } = trpc.useMutation(['todo.complete'], {
+  const { mutate: completeTodo } = trpc.todo.complete.useMutation({
     onSuccess: () => refetchTodos(),
   });
 
@@ -49,8 +49,8 @@ const Todo: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Todo</title>
-        <meta name="description" content="mapper | Todo" />
+        <title>turbomeet | Todo</title>
+        <meta name="description" content="turbomeet | Todo" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

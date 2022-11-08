@@ -15,10 +15,11 @@ export function SideNav() {
   return (
     <aside className="sticky top-0 flex w-full flex-shrink-0 flex-col bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200 md:h-screen md:w-64">
       <div className="flex flex-shrink-0 flex-row items-center justify-between px-8 py-4">
-        <Link href="/">
-          <a className="focus:shadow-outline rounded-lg text-lg font-semibold uppercase tracking-widest text-gray-900 focus:outline-none dark:text-white">
-            mapper
-          </a>
+        <Link
+          href="/"
+          className="focus:shadow-outline rounded-lg text-lg font-semibold uppercase tracking-widest text-gray-900 focus:outline-none dark:text-white"
+        >
+          turbomeet
         </Link>
         <Button
           className="focus:shadow-outline rounded-lg focus:outline-none md:hidden"
@@ -61,10 +62,8 @@ export function SideNav() {
         )}
       >
         <ThemeToggle />
-        <Link href="https://github.com/TKSpectro/mapper">
-          <a>
-            <FiGithub className="float-right h-6 w-6" />
-          </a>
+        <Link href="https://github.com/TKSpectro/turbomeet">
+          <FiGithub className="float-right h-6 w-6" />
         </Link>
       </div>
     </aside>
@@ -81,18 +80,17 @@ function NavLink({ href, children }: NavLinkProps) {
   const isCurrentRoute = router.route === href || router.route.startsWith(`${href}`);
 
   return (
-    <Link href={href}>
-      <a
-        className={clsx(
-          'focus:shadow-outline mt-2 block rounded-lg px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200 hover:text-gray-900 focus:bg-gray-200 focus:text-gray-900 focus:outline-none dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:bg-gray-600 dark:focus:text-white',
-          {
-            'bg-transparent': !isCurrentRoute,
-            'dark: bg-gray-200 dark:bg-gray-900': isCurrentRoute,
-          },
-        )}
-      >
-        {children}
-      </a>
+    <Link
+      href={href}
+      className={clsx(
+        'focus:shadow-outline mt-2 block rounded-lg px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200 hover:text-gray-900 focus:bg-gray-200 focus:text-gray-900 focus:outline-none dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:bg-gray-600 dark:focus:text-white',
+        {
+          'bg-transparent': !isCurrentRoute,
+          'dark: bg-gray-200 dark:bg-gray-900': isCurrentRoute,
+        },
+      )}
+    >
+      {children}
     </Link>
   );
 }

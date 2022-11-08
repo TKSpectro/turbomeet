@@ -29,8 +29,8 @@ const Components: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Components</title>
-        <meta name="description" content="mapper | Components" />
+        <title>turbomeet | Components</title>
+        <meta name="description" content="turbomeet | Components" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

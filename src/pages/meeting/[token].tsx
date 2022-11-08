@@ -14,8 +14,8 @@ const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Meeting</title>
-        <meta name="description" content="mapper | Meeting" />
+        <title>turbomeet | Meeting</title>
+        <meta name="description" content="turbomeet | Meeting" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

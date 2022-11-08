@@ -1,14 +1,14 @@
-import { Button } from '@/components/ui/button';
-import { Form, useZodForm } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Loading } from '@/components/ui/loading';
-import { trpc } from '@/utils/trpc';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { date, z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Form, useZodForm } from '../components/ui/form';
+import { Input } from '../components/ui/input';
+import { Loading } from '../components/ui/loading';
+import { trpc } from '../utils/trpc';
 
 const Dashboard: NextPage = () => {
-  const { data: meetings, isLoading, refetch } = trpc.useQuery(['meeting.getAll']);
+  const { data: meetings, isLoading, refetch } = trpc.meeting.getAll.useQuery();
 
   const form = useZodForm({
     schema: z.object({
@@ -24,7 +24,7 @@ const Dashboard: NextPage = () => {
     }),
   });
 
-  const { mutate: createMeeting } = trpc.useMutation(['meeting.create'], {
+  const { mutate: createMeeting } = trpc.meeting.create.useMutation({
     onSuccess() {
       refetch();
       form.reset();
@@ -34,8 +34,8 @@ const Dashboard: NextPage = () => {
   return (
     <>
       <Head>
-        <title>mapper | Dashboard</title>
-        <meta name="description" content="mapper | Dashboard" />
+        <title>turbomeet | Dashboard</title>
+        <meta name="description" content="turbomeet | Dashboard" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
