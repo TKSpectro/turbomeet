@@ -7,6 +7,7 @@ import { Layout } from '../components/layout/layout';
 import { trpc } from '../utils/trpc';
 
 import '../styles/globals.css';
+import '../styles/test.scss';
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

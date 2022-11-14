@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { FiGithub } from 'react-icons/fi';
 import { HiOutlineMenuAlt3, HiOutlineX } from 'react-icons/hi';
 import { Button } from '../ui/button';
+import { CommandMenu2 } from '../ui/cmd-k2';
 import { ThemeToggle } from './theme-toggle';
 
 export function SideNav() {
@@ -31,6 +32,7 @@ export function SideNav() {
           </svg>
         </Button>
       </div>
+      <CommandMenu2 />
       <nav
         className={clsx('flex-grow px-4 pb-4 md:block md:overflow-y-auto md:pb-0', {
           block: open,
