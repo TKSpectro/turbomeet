@@ -10,6 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Todo {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  completed   Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 // Necessary for Next auth
 model Account {
   id                       String  @id @default(cuid())
@@ -39,18 +50,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id             String        @id @default(cuid())
-  name           String?
-  email          String?       @unique
-  emailVerified  DateTime?
-  image          String?
-  accounts       Account[]
-  sessions       Session[]
-  todos          Todo[]
-  participations Participant[]
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -59,44 +58,63 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Todo {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  completed   Boolean
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts      Account[]
+  sessions      Session[]
+  todos         Todo[]
+  meetings      Meeting[]
+  ownedMeetings Meeting[] @relation("owner")
+  votes         Vote[]
 }
 
 model Meeting {
-  id          String      @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
   deadline    DateTime?
   location    String?
   link        String?
-  closed      Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  ownerId     String
-  owner       Participant @relation(name: "owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  closed      Boolean   @default(false)
+  public      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  // Instead of directyly referencing user, participant model which can 
-  // have a user and gives use the possibilty for public meetings and private ones which
-  // would need a invitation or something like that.
-  participants Participant[]
-  // TODO: Votes
-  // TODO: Comments
+  appointments Appointment[]
+
+  ownerId       String?
+  owner         User?   @relation(name: "owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerUsername String?
+
+  participants User[]
 }
 
-model Participant {
-  id            String    @id @default(cuid())
-  username      String?
-  meetingId     String?
-  meeting       Meeting?  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  userId        String?
-  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ownedMeetings Meeting[] @relation(name: "owner")
+model Appointment {
+  id        String   @id @default(cuid())
+  start     DateTime
+  end       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meetingId String?
+  Meeting   Meeting? @relation(fields: [meetingId], references: [id])
+  votes     Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username String?
+  userId   String?
+  user     User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
 }

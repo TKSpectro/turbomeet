@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import { date, z } from 'zod';
 import { Button } from '../components/ui/button';
 import { Form, useZodForm } from '../components/ui/form';
@@ -52,13 +53,11 @@ const Dashboard: NextPage = () => {
         </Form>
         {isLoading && <Loading width={200} height={200} />}
         {meetings?.map((meeting) => (
-          <div key={meeting.id} className="border border-gray-800">
-            <div>
-              <p>{meeting.title}</p>
-              <p>{meeting.description}</p>
-              <p>{meeting.deadline?.toLocaleString()}</p>
-            </div>
-          </div>
+          <Link key={meeting.id} href={`/meeting/${meeting.id}`} className="border border-gray-800">
+            <p>{meeting.title}</p>
+            <p>{meeting.description}</p>
+            <p>{meeting.deadline?.toLocaleString()}</p>
+          </Link>
         ))}
       </main>
     </>
