@@ -4,11 +4,11 @@ import type { FieldValues, SubmitHandler, UseFormProps, UseFormReturn } from 're
 import { FormProvider, useForm } from 'react-hook-form';
 import type { TypeOf, ZodSchema } from 'zod';
 
-interface UseZodFormProps<T extends ZodSchema<any>> extends UseFormProps<TypeOf<T>> {
+interface UseZodFormProps<T extends ZodSchema<T>> extends UseFormProps<TypeOf<T>> {
   schema: T;
 }
 
-export const useZodForm = <T extends ZodSchema<any>>({
+export const useZodForm = <T extends ZodSchema<T>>({
   schema,
   ...formConfig
 }: UseZodFormProps<T>) => {
@@ -18,7 +18,7 @@ export const useZodForm = <T extends ZodSchema<any>>({
   });
 };
 
-interface Props<T extends FieldValues = any> extends Omit<ComponentProps<'form'>, 'onSubmit'> {
+interface Props<T extends FieldValues = never> extends Omit<ComponentProps<'form'>, 'onSubmit'> {
   form: UseFormReturn<T>;
   onSubmit: SubmitHandler<T>;
 }
