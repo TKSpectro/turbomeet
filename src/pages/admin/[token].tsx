@@ -3,14 +3,14 @@ import { useRouter } from 'next/router';
 import { MeetingPage } from '../../components/pages/meeting';
 import { trpc } from '../../utils/trpc';
 
-const Dashboard: NextPage = () => {
+const Admin: NextPage = () => {
   const router = useRouter();
   const { token } = router.query;
   const { data: meeting, isLoading } = trpc.meetingPublic.getOne.useQuery({
     token: token as string,
   });
 
-  return <MeetingPage adminView={false} meeting={meeting} isLoading={isLoading} />;
+  return <MeetingPage adminView={true} meeting={meeting} isLoading={isLoading} />;
 };
 
-export default Dashboard;
+export default Admin;

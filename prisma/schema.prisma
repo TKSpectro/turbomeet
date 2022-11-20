@@ -75,6 +75,7 @@ model User {
 
 model Meeting {
   id          String    @id @default(cuid())
+  adminToken  String    @unique @default(cuid())
   title       String
   description String?
   deadline    DateTime?
