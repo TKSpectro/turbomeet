@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { date, z } from 'zod';
+import { z } from 'zod';
 import { Button } from '../../components/ui/button';
 import { Form, useZodForm } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
@@ -25,10 +25,7 @@ const Dashboard: NextPage = () => {
         .string()
         .max(300, { message: 'Must be 300 or less characters long' })
         .nullable(),
-      deadline: z.preprocess((arg) => {
-        if (arg && (typeof arg == 'string' || arg instanceof Date)) return new Date(arg);
-        return null;
-      }, z.nullable(date())),
+      deadline: z.date().nullable(),
     }),
   });
 
@@ -48,7 +45,11 @@ const Dashboard: NextPage = () => {
           <Input label="Username" {...form.register('username')} />
           <Input label="Title" {...form.register('title')} placeholder="Sprint Meeting 1" />
           <Input label="Description" {...form.register('description')} />
-          <Input label="Deadline" type="datetime-local" {...form.register('deadline')} />
+          <Input
+            label="Deadline"
+            type="datetime-local"
+            {...form.register('deadline', { value: null, valueAsDate: true })}
+          />
 
           <Button type="submit">Submit</Button>
         </Form>
