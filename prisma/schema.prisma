@@ -97,14 +97,25 @@ model Meeting {
 
 model Appointment {
   id        String   @id @default(cuid())
-  start     DateTime
-  end       DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  date DateTime
+
+  times Times[]
+  votes Vote[]
+
   meetingId String?
   Meeting   Meeting? @relation(fields: [meetingId], references: [id])
-  votes     Vote[]
+}
+
+model Times {
+  id    String    @id @default(cuid())
+  start DateTime?
+  end   DateTime?
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
 }
 
 model Vote {

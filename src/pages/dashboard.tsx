@@ -1,24 +1,18 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { z } from 'zod';
 import { Button } from '../components/ui/button';
 import { Form, useZodForm } from '../components/ui/form';
 import { Input } from '../components/ui/input';
 import { Loading } from '../components/ui/loading';
+import { zMeetingCreateInput } from '../types/zod-meeting';
 import { trpc } from '../utils/trpc';
 
 const Dashboard: NextPage = () => {
   const { data: meetings, isLoading, refetch } = trpc.meeting.getAll.useQuery();
 
-  const schema = z.object({
-    title: z.string().min(1, { message: 'Must be at least 1 character long' }),
-    description: z.string().max(300, { message: 'Must be 300 or less characters long' }).nullable(),
-    deadline: z.date().nullable(),
-  });
-
   const form = useZodForm({
-    schema,
+    schema: zMeetingCreateInput,
   });
 
   const { mutate: createMeeting } = trpc.meeting.create.useMutation({
@@ -26,6 +20,13 @@ const Dashboard: NextPage = () => {
       refetch();
       form.reset();
     },
+    // TODO: If we would want to show server side errors
+    // onError(error) {
+    //   const parsedErrorMessages = JSON.parse(error.message);
+    //   for (error of parsedErrorMessages) {
+    //     form.setError(error.path[0], { message: error.message });
+    //   }
+    // },
   });
 
   return (

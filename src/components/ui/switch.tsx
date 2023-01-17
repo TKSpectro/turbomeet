@@ -2,8 +2,8 @@ import clsx from 'clsx';
 interface Props {
   isLeft: boolean;
   onClick: () => void;
-  leftIcon: React.ReactNode;
-  rightIcon: React.ReactNode;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   big?: boolean;
 }
 

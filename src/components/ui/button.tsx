@@ -21,6 +21,7 @@ export function Button({ children, variant = 'primary', fullWidth = false, ...pr
           'bg-info': variant === 'info',
         },
       )}
+      type="button"
       {...props}
     >
       {children}

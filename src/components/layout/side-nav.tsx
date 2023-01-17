@@ -40,6 +40,7 @@ export function SideNav() {
         {session && (
           <>
             <NavLink href="/dashboard">Dashboard</NavLink>
+            <NavLink href="/meeting">Meeting</NavLink>
             <NavLink href="/todo">Todo</NavLink>
             <NavLink href="/components">Components</NavLink>
             <NavLink href="/profile">Profile</NavLink>
