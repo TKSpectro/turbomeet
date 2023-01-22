@@ -10,6 +10,48 @@ export const meetingRouter = router({
       orderBy: { deadline: 'desc' },
     });
   }),
+  getOne: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.meeting.findFirst({
+        where: { id: input.token, participants: { some: { id: ctx.session.user.id } } },
+        include: {
+          participants: {
+            include: {
+              votes: {
+                include: { appointment: { include: { times: true } } },
+                where: { appointment: { meetingId: input.token } },
+              },
+            },
+          },
+        },
+      });
+    }),
+  getOneAsAdmin: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const meeting = await ctx.prisma.meeting.findFirst({
+        where: { id: input.token, ownerId: ctx.session.user.id },
+        include: {
+          participants: {
+            include: {
+              votes: {
+                include: { appointment: { include: { times: true } } },
+                where: { appointment: { meetingId: input.token } },
+              },
+            },
+          },
+        },
+      });
+      if (!meeting) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Meeting not found',
+        });
+      }
+
+      return meeting;
+    }),
   create: protectedProcedure.input(zMeetingCreateInput).mutation(async ({ ctx, input }) => {
     let deadline: Date | null = null;
     if (input.deadline) {
@@ -23,6 +65,7 @@ export const meetingRouter = router({
         deadline: deadline,
         participants: { connect: { id: ctx.session.user.id } },
         owner: { connect: { id: ctx.session.user.id } },
+        ownerUsername: ctx.session.user.name,
         appointments: {
           create: input.appointments?.map((appointment) => ({
             date: new Date(appointment.date),

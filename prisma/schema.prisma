@@ -118,10 +118,18 @@ model Times {
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
 }
 
+enum Answer {
+  YES
+  IFNECESSARY
+  NO
+}
+
 model Vote {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  answer Answer
 
   username String?
   userId   String?

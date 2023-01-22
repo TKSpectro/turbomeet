@@ -27,7 +27,7 @@ const Dashboard: NextPage = () => {
 
   const { mutate: createMeeting, error } = trpc.meeting.create.useMutation({
     onSuccess: (data) => {
-      router.push(`/meeting/${data.id}`);
+      router.push(`/admin/${data.id}`);
     },
   });
 
