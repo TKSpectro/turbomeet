@@ -6,10 +6,11 @@ import { useFormContext } from 'react-hook-form';
 export interface Props extends ComponentProps<'input'> {
   label?: string;
   icon?: ReactNode;
+  disableLabel?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { label, icon, type = 'text', ...props },
+  { label, icon, disableLabel = false, type = 'text', ...props },
   ref,
 ) {
   const {
@@ -21,7 +22,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
     return (
       <>
         <input
-          className="text-primary focus:border-primary self-center bg-white focus:ring-transparent"
+          className="self-center bg-white text-primary focus:border-primary focus:ring-transparent"
           type={type}
           ref={ref}
           {...props}
@@ -54,7 +55,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
         <input
           id={`input-${props.name}`}
           className={clsx(
-            'focus:border-primary focus:ring-primary w-full rounded-md border bg-white py-2 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+            'w-full rounded-md border bg-white py-2 text-gray-800 focus:border-primary focus:ring-primary dark:bg-gray-900 dark:text-gray-200',
             icon && 'pl-12 pr-4 ',
             !icon && 'px-4',
           )}
@@ -63,10 +64,11 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
           {...props}
         />
       </div>
-
-      <div className="text-sm font-bold text-red-500">
-        <>&nbsp;{error?.message}</>
-      </div>
+      {!disableLabel && (
+        <div className="text-sm font-bold text-red-500">
+          <>&nbsp;{error?.message}</>
+        </div>
+      )}
     </div>
   );
 });

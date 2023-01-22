@@ -10,6 +10,8 @@ export interface Props extends ComponentProps<'button'> {
 export function Button({ children, variant = 'primary', fullWidth = false, ...props }: Props) {
   return (
     <button
+      type="button"
+      {...props}
       className={clsx(
         `items-center justify-center rounded-md px-6 py-2 font-medium text-gray-800 hover:bg-opacity-90 disabled:cursor-not-allowed`,
         {
@@ -20,9 +22,8 @@ export function Button({ children, variant = 'primary', fullWidth = false, ...pr
           'bg-warning': variant === 'warning',
           'bg-info': variant === 'info',
         },
+        props.className ? props.className : '',
       )}
-      type="button"
-      {...props}
     >
       {children}
     </button>
