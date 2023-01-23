@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { MeetingPage } from '../../components/pages/meeting';
+import { MeetingDetailPage } from '../../components/pages/meeting-detail';
 import { trpc } from '../../utils/trpc';
 
 const Admin: NextPage = () => {
@@ -10,7 +10,7 @@ const Admin: NextPage = () => {
     token: token?.toString() || '',
   });
 
-  return <MeetingPage adminView={true} meeting={meeting} isLoading={isLoading} />;
+  return <MeetingDetailPage adminView={true} meeting={meeting} isLoading={isLoading} />;
 };
 
 export default Admin;

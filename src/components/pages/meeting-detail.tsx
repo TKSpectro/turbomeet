@@ -10,8 +10,8 @@ type Props = {
   isLoading: boolean;
 };
 
-export function MeetingPage({ adminView, meeting, isLoading }: Props) {
-  const [copyToClipboardState, copyToClipboard] = useCopyToClipboard();
+export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
+  const [, copyToClipboard] = useCopyToClipboard();
 
   let meetingUrl = '';
   if (typeof window !== 'undefined') {
