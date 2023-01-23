@@ -7,20 +7,11 @@ export const meetingRouter = router({
   getAll: protectedProcedure
     .input(z.object({ haveToVote: z.boolean().optional() }).optional())
     .query(async ({ ctx, input }) => {
-      // const where = {};
-
-      // if (input?.haveToVote === true) {
-      //   where['participants'] = { some: { id: ctx.session.user.id, votes: { none: {} } } };
-      // }
-
       return await ctx.prisma.meeting.findMany({
         where: {
           participants: {
             some: {
               id: ctx.session.user.id,
-              // appointments: { some: { votes: { none: {} } } },
-              // if haveToVote is set where there are no votes from this user
-              // votes: input?.haveToVote === true ? { none: {} } : undefined,
             },
           },
           appointments:
