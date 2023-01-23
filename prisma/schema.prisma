@@ -10,17 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Todo {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  completed   Boolean
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 // Necessary for Next auth
 model Account {
   id                       String  @id @default(cuid())
@@ -67,7 +56,6 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
-  todos         Todo[]
   meetings      Meeting[]
   ownedMeetings Meeting[] @relation("owner")
   votes         Vote[]
