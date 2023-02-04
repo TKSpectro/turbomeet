@@ -29,6 +29,7 @@
     "@trpc/server": "10.0.0-rc.4",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.6",
+    "luxon": "^3.2.1",
     "next": "13.0.2",
     "next-auth": "^4.16.4",
     "next-themes": "^0.2.1",
@@ -41,6 +42,7 @@
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "@types/luxon": "^3.2.0",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",

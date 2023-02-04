@@ -1,4 +1,6 @@
+import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { DateTime } from 'luxon';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -51,9 +53,7 @@ const Dashboard: NextPage = () => {
     });
   };
 
-  const [appointments, setAppointments] = useState<
-    { date: Date; times: { start: Date; end: Date }[] }[]
-  >([]);
+  const [appointments, setAppointments] = useState<string[]>([]);
 
   const [enableSpecificTimes, setEnableSpecificTimes] = useState(false);
 
@@ -63,72 +63,47 @@ const Dashboard: NextPage = () => {
     });
   };
 
-  const addAppointmentTime = (dateIndex: number) => {
+  const addAppointmentTime = (date: string) => {
+    setAppointments((oldDates) => {
+      const start = new Date(date.split('/')[0] || new Date());
+      start.setHours(12);
+      start.setMinutes(0);
+
+      const end = new Date(
+        date.split('/')[1] || DateTime.fromJSDate(start).plus({ hours: 1 }).toJSDate(),
+      );
+
+      return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
+    });
+  };
+
+  const updateAppointmentTime = (dateIndex: number, newDate: Date | null, isStart: boolean) => {
     setAppointments((oldDates) => {
       return oldDates.map((oldDate, i) => {
         if (i === dateIndex) {
-          const newStartTime = new Date();
-          newStartTime.setHours(12);
-          newStartTime.setMinutes(0);
+          const start = new Date(oldDate.split('/')[0] || new Date());
+          const end = new Date(
+            oldDate.split('/')[1] || DateTime.fromJSDate(start).plus({ hours: 1 }).toJSDate(),
+          );
 
-          const newEndTime = new Date();
-          newEndTime.setHours(12);
-          newEndTime.setMinutes(30);
+          if (isStart) {
+            start.setHours(newDate?.getHours() || 12);
+            start.setMinutes((newDate?.getMinutes() || 0) + new Date().getTimezoneOffset());
+          } else {
+            end.setHours(newDate?.getHours() || 12);
+            end.setMinutes((newDate?.getMinutes() || 0) + new Date().getTimezoneOffset());
+          }
 
-          return {
-            ...oldDate,
-            times: [...oldDate.times, { start: newStartTime, end: newEndTime }],
-          };
+          return `${start.toISOString()}/${end.toISOString()}`;
         }
         return oldDate;
       });
     });
   };
 
-  const updateAppointmentTime = (
-    dateIndex: number,
-    timeIndex: number,
-    newDate: Date | null,
-    isStart: boolean,
-  ) => {
-    const timeKey = isStart ? 'start' : 'end';
-
+  const removeAppointmentTime = (dateIndex: number) => {
     setAppointments((oldDates) => {
-      return oldDates.map((oldDate, i) => {
-        if (i === dateIndex) {
-          return {
-            ...oldDate,
-            times: oldDate.times.map((oldTime, j) => {
-              if (j === timeIndex) {
-                oldTime[timeKey].setHours(newDate?.getHours() || 12);
-                oldTime[timeKey].setMinutes(
-                  (newDate?.getMinutes() || 0) + new Date().getTimezoneOffset(),
-                );
-                return {
-                  ...oldTime,
-                  [timeKey]: oldTime[timeKey],
-                };
-              }
-              return oldTime;
-            }),
-          };
-        }
-        return oldDate;
-      });
-    });
-  };
-
-  const removeAppointmentTime = (dateIndex: number, timeIndex: number) => {
-    setAppointments((oldDates) => {
-      return oldDates.map((oldDate, i) => {
-        if (i === dateIndex) {
-          return {
-            ...oldDate,
-            times: oldDate.times.filter((_, j) => j !== timeIndex),
-          };
-        }
-        return oldDate;
-      });
+      return oldDates.filter((_, i) => i !== dateIndex);
     });
   };
 
@@ -152,11 +127,13 @@ const Dashboard: NextPage = () => {
               title: meetingForm.getValues('title'),
               description: meetingForm.getValues('description'),
               deadline: meetingForm.getValues('deadline'),
-              appointments: enableSpecificTimes
-                ? appointments
-                : appointments.map((a) => {
-                    return { date: a.date, times: [] };
-                  }),
+              appointments: appointments.map((date) => {
+                if (enableSpecificTimes) {
+                  return date;
+                } else {
+                  return date.split('/')[0] || date;
+                }
+              }),
             });
           }}
         >
@@ -184,10 +161,7 @@ const Dashboard: NextPage = () => {
                 setAppointments((oldDates) => {
                   return [
                     ...oldDates,
-                    {
-                      date: e.target.valueAsDate || new Date(),
-                      times: [{ start: new Date(), end: new Date() }],
-                    },
+                    `${new Date(e.target.valueAsDate || new Date()).toISOString()}`,
                   ];
                 });
               }}
@@ -214,19 +188,38 @@ const Dashboard: NextPage = () => {
                 {enableSpecificTimes ? (
                   <div className="divide-y">
                     {appointments
-                      .sort((a, b) => a.date.getTime() - b.date.getTime())
-                      .map((date, index) => {
+                      .reduce((acc, date, index) => {
+                        const start = new Date(date.split('/')[0] || '');
+                        const end = new Date(date.split('/')[1] || '');
+
+                        const shortDate = `${start.toISOString().split('T')[0]}`;
+
+                        const accIndex = acc.findIndex((a) => a.date === shortDate);
+                        // Date doesn't exist in array
+                        if (accIndex === -1) {
+                          acc.push({
+                            date: shortDate,
+                            times: [{ index, start, end }],
+                          });
+                        } else {
+                          acc[accIndex]?.times.push({ index, start, end });
+                        }
+
+                        return [...acc];
+                      }, [] as { date: string; times: { index: number; start: Date; end: Date }[] }[])
+                      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                      .map((appointment, index) => {
                         return (
                           <div
                             key={index}
                             className="space-y-3 py-4 sm:flex sm:space-y-0 sm:space-x-4"
                           >
                             <div>
-                              <DateCard {...getDateProps(date.date)} />
+                              <DateCard {...getDateProps(new Date(appointment.date))} />
                             </div>
 
                             <div className="grow space-y-3">
-                              {date.times.map((time, timeIndex) => {
+                              {appointment.times.map((time, timeIndex) => {
                                 return (
                                   <div key={timeIndex} className="flex items-center space-x-3">
                                     <Input
@@ -238,8 +231,7 @@ const Dashboard: NextPage = () => {
                                       }${time.start.getMinutes()}`}
                                       onChange={(e) => {
                                         updateAppointmentTime(
-                                          index,
-                                          timeIndex,
+                                          time.index,
                                           e.target.valueAsDate,
                                           true,
                                         );
@@ -255,8 +247,7 @@ const Dashboard: NextPage = () => {
                                       }${time.end.getMinutes()}`}
                                       onChange={(e) => {
                                         updateAppointmentTime(
-                                          index,
-                                          timeIndex,
+                                          time.index,
                                           e.target.valueAsDate,
                                           false,
                                         );
@@ -265,7 +256,7 @@ const Dashboard: NextPage = () => {
                                     />
                                     <Button
                                       onClick={() => {
-                                        removeAppointmentTime(index, timeIndex);
+                                        removeAppointmentTime(time.index);
                                       }}
                                     >
                                       <HiOutlineX className="h-6 w-6 text-gray-800 dark:text-gray-200" />
@@ -273,10 +264,11 @@ const Dashboard: NextPage = () => {
                                   </div>
                                 );
                               })}
+
                               <div className="flex items-center space-x-3">
                                 <Button
                                   onClick={() => {
-                                    addAppointmentTime(index);
+                                    addAppointmentTime(appointment.date);
                                   }}
                                 >
                                   Add time option
@@ -292,21 +284,44 @@ const Dashboard: NextPage = () => {
                         );
                       })}
                   </div>
-                ) : appointments.length ? (
-                  <div className="grid grid-cols-[repeat(auto-fill,60px)] gap-5 py-4">
+                ) : (
+                  <div
+                    className={clsx('grid grid-cols-[repeat(auto-fill,60px)] gap-5', {
+                      'py-4': appointments.length > 0,
+                    })}
+                  >
                     {appointments
-                      .sort((a, b) => a.date.getTime() - b.date.getTime())
-                      .map((appointment, i) => {
+                      .reduce((acc, date, index) => {
+                        const start = new Date(date.split('/')[0] || '');
+                        const end = new Date(date.split('/')[1] || '');
+
+                        const shortDate = `${start.toISOString().split('T')[0]}`;
+
+                        const accIndex = acc.findIndex((a) => a.date === shortDate);
+                        // Date doesn't exist in array
+                        if (accIndex === -1) {
+                          acc.push({
+                            date: shortDate,
+                            times: [{ index, start, end }],
+                          });
+                        } else {
+                          acc[accIndex]?.times.push({ index, start, end });
+                        }
+
+                        return [...acc];
+                      }, [] as { date: string; times: { index: number; start: Date; end: Date }[] }[])
+                      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                      .map((appointment, index) => {
                         return (
                           <DateCard
-                            key={i}
-                            {...getDateProps(appointment.date)}
+                            key={index}
+                            {...getDateProps(new Date(appointment.date))}
                             annotation={
                               <button
                                 className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-colors hover:bg-slate-200 dark:bg-slate-600 dark:text-slate-200 dark:hover:bg-slate-500 "
                                 type="button"
                                 onClick={() => {
-                                  removeAppointment(i);
+                                  removeAppointment(index);
                                 }}
                               >
                                 <HiOutlineX className="h-3 w-3" />
@@ -316,7 +331,8 @@ const Dashboard: NextPage = () => {
                         );
                       })}
                   </div>
-                ) : (
+                )}
+                {!appointments.length && (
                   <div className="flex h-full items-center justify-center py-12">
                     <div className="text-center font-medium text-gray-400 dark:text-gray-100">
                       <div>{'Please select the first appointment date'}</div>
@@ -326,28 +342,30 @@ const Dashboard: NextPage = () => {
               </div>
             </div>
 
-            <Button onClick={stepBackward} className="mr-1">
-              Back
-            </Button>
-            <Button
-              type="submit"
-              onClick={async () => {
-                // Trigger validation programmatically as it triggers AFTER the submit
-                await meetingForm.trigger();
+            <div className="border-t pt-4">
+              <Button onClick={stepBackward} className="mr-1">
+                Back
+              </Button>
+              <Button
+                type="submit"
+                onClick={async () => {
+                  // Trigger validation programmatically as it triggers AFTER the submit
+                  await meetingForm.trigger();
 
-                // If there is a other error than the appointments error, a field in the first form page is invalid
-                if (
-                  Object.keys(meetingForm.formState.errors).findIndex(
-                    (key) => key !== 'appointments',
-                  ) !== -1
-                ) {
-                  setStep(0);
-                  return;
-                }
-              }}
-            >
-              Create Meeting
-            </Button>
+                  // If there is a other error than the appointments error, a field in the first form page is invalid
+                  if (
+                    Object.keys(meetingForm.formState.errors).findIndex(
+                      (key) => key !== 'appointments',
+                    ) !== -1
+                  ) {
+                    setStep(0);
+                    return;
+                  }
+                }}
+              >
+                Create Meeting
+              </Button>
+            </div>
           </div>
         </Form>
 

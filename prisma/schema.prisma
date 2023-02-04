@@ -75,6 +75,7 @@ model Meeting {
   updatedAt   DateTime  @updatedAt
 
   appointments Appointment[]
+  votes        Vote[]
 
   ownerId       String?
   owner         User?   @relation(name: "owner", fields: [ownerId], references: [id], onDelete: Cascade)
@@ -88,22 +89,12 @@ model Appointment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  date DateTime
+  value String
 
-  times Times[]
   votes Vote[]
 
   meetingId String?
-  Meeting   Meeting? @relation(fields: [meetingId], references: [id])
-}
-
-model Times {
-  id    String    @id @default(cuid())
-  start DateTime?
-  end   DateTime?
-
-  appointmentId String
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  meeting   Meeting? @relation(fields: [meetingId], references: [id])
 }
 
 enum Answer {
@@ -117,12 +108,15 @@ model Vote {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  answer Answer
+  answer Answer @default(YES)
 
   username String?
   userId   String?
   user     User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  appointmentId String
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+
+  meetingId String?
+  meeting   Meeting? @relation(fields: [meetingId], references: [id])
 }

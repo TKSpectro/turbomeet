@@ -14,10 +14,11 @@ export const meetingRouter = router({
               id: ctx.session.user.id,
             },
           },
-          appointments:
-            input?.haveToVote === true
-              ? { every: { votes: { none: { userId: ctx.session.user.id } } } }
-              : undefined,
+          // TODO: Have to reimplement the fetching for meetings that the user has to vote for
+          // appointments:
+          //   input?.haveToVote === true
+          //     ? { every: { votes: { none: { userId: ctx.session.user.id } } } }
+          //     : undefined,
         },
         orderBy: { deadline: 'asc' },
       });
@@ -31,7 +32,7 @@ export const meetingRouter = router({
           participants: {
             include: {
               votes: {
-                include: { appointment: { include: { times: true } } },
+                include: { user: true },
                 where: { appointment: { meetingId: input.token } },
               },
             },
@@ -45,10 +46,18 @@ export const meetingRouter = router({
       const meeting = await ctx.prisma.meeting.findFirst({
         where: { id: input.token, ownerId: ctx.session.user.id },
         include: {
+          appointments: {
+            include: {
+              votes: {
+                include: { user: true },
+                where: { appointment: { meetingId: input.token } },
+              },
+            },
+          },
           participants: {
             include: {
               votes: {
-                include: { appointment: { include: { times: true } } },
+                include: { user: true },
                 where: { appointment: { meetingId: input.token } },
               },
             },
@@ -79,15 +88,11 @@ export const meetingRouter = router({
         owner: { connect: { id: ctx.session.user.id } },
         ownerUsername: ctx.session.user.name,
         appointments: {
-          create: input.appointments?.map((appointment) => ({
-            date: new Date(appointment.date),
-            times: {
-              create: appointment.times.map((time) => ({
-                start: time.start ? new Date(time.start) : null,
-                end: time.end ? new Date(time.end) : null,
-              })),
-            },
-          })),
+          createMany: {
+            data: input.appointments?.map((value) => ({
+              value,
+            })),
+          },
         },
       },
     });
