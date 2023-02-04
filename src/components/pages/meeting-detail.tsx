@@ -92,7 +92,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                     return (
                       <div key={participant.id}>
                         <div className="flex items-center py-2 pl-4 pr-2">{participant.name}</div>
-                        <div className="flex">
+                        {/* <div className="flex">
                           {participant.votes
                             ?.sort(
                               (a, b) => a.appointment.date.getTime() - b.appointment.date.getTime(),
@@ -116,7 +116,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                                 )}
                               </div>
                             ))}
-                        </div>
+                        </div> */}
                       </div>
                     );
                   })}
