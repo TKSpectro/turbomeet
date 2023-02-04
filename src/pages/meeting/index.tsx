@@ -175,7 +175,7 @@ const Dashboard: NextPage = () => {
                   </div>
                   <div>
                     <Switch
-                      isLeft={enableSpecificTimes}
+                      isRight={enableSpecificTimes}
                       onClick={() => {
                         setEnableSpecificTimes((oldValue) => !oldValue);
                       }}
