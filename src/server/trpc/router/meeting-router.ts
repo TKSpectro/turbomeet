@@ -14,11 +14,18 @@ export const meetingRouter = router({
               id: ctx.session.user.id,
             },
           },
-          // TODO: Have to reimplement the fetching for meetings that the user has to vote for
-          // appointments:
-          //   input?.haveToVote === true
-          //     ? { every: { votes: { none: { userId: ctx.session.user.id } } } }
-          //     : undefined,
+          appointments:
+            input?.haveToVote === true
+              ? {
+                  every: {
+                    votes: {
+                      none: {
+                        userId: ctx.session.user.id,
+                      },
+                    },
+                  },
+                }
+              : undefined,
         },
         orderBy: { deadline: 'asc' },
       });
