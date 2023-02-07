@@ -180,7 +180,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
               </div>
             </div>
 
-            <div className="card mt-4 p-4">
+            <div className="card mt-4 overflow-x-auto p-4">
               <div className="flex py-2 pl-4 pr-2 font-medium" style={{ marginLeft: barWidth }}>
                 {sortedAppointments.map((appointment) => {
                   const start = new Date(appointment.value.split('/')[0] || '');
@@ -203,8 +203,8 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                   );
                 })}
               </div>
-              <div className="flex shrink-0 items-center py-2 pl-4 pr-2 font-medium">
-                <div className="flex h-full self-end" style={{ width: barWidth }}>
+              <div className="flex items-center py-2 pl-4 pr-2 font-medium">
+                <div className="flex h-full shrink-0 self-end" style={{ width: barWidth }}>
                   {meeting.participants?.length} participant
                   {meeting.participants?.length > 1 && 's'}
                 </div>
@@ -225,11 +225,13 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                   })}
                 </div>
               </div>
-              <div className="shrink-0 items-center py-2 pl-4 pr-2 font-medium">
+              <div className="items-center py-2 pl-4 pr-2 font-medium">
                 {meeting.participants.map((participant) => {
                   return (
                     <div key={participant.id} className="flex py-3">
-                      <div style={{ width: barWidth }}>{participant.name}</div>
+                      <div className="shrink-0" style={{ width: barWidth }}>
+                        {participant.name}
+                      </div>
                       {participant.votes
                         .sort((a, b) => {
                           const aAppIndex = sortedAppointments.findIndex(
@@ -246,7 +248,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                             <div
                               key={vote.id}
                               className="flex justify-center"
-                              style={{ width: columnWidth }}
+                              style={{ width: columnWidth, minWidth: columnWidth }}
                             >
                               <AnswerIcon answer={vote.answer} />
                             </div>
@@ -257,7 +259,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                           <div
                             key={i}
                             className="flex justify-center"
-                            style={{ width: columnWidth }}
+                            style={{ width: columnWidth, minWidth: columnWidth }}
                           >
                             <AnswerIcon />
                           </div>
