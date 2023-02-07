@@ -36,10 +36,11 @@ export const meetingRouter = router({
       return await ctx.prisma.meeting.findFirst({
         where: { id: input.token, participants: { some: { id: ctx.session.user.id } } },
         include: {
+          appointments: true,
           participants: {
             include: {
               votes: {
-                include: { user: true },
+                // include: { user: true },
                 where: { appointment: { meetingId: input.token } },
               },
             },

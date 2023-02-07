@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import dayjs from 'dayjs';
 import { DateTime } from 'luxon';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -14,15 +13,6 @@ import { Form, useZodForm } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
 import { zMeetingCreateInput } from '../../types/zod-meeting';
 import { trpc } from '../../utils/trpc';
-
-export const getDateProps = (date: Date) => {
-  const d = dayjs(date);
-  return {
-    day: d.format('D'),
-    dow: d.format('ddd'),
-    month: d.format('MMM'),
-  };
-};
 
 const Dashboard: NextPage = () => {
   const router = useRouter();
@@ -215,7 +205,7 @@ const Dashboard: NextPage = () => {
                             className="space-y-3 py-4 sm:flex sm:space-y-0 sm:space-x-4"
                           >
                             <div>
-                              <DateCard {...getDateProps(new Date(appointment.date))} />
+                              <DateCard date={new Date(appointment.date)} />
                             </div>
 
                             <div className="grow space-y-3">
@@ -315,7 +305,7 @@ const Dashboard: NextPage = () => {
                         return (
                           <DateCard
                             key={index}
-                            {...getDateProps(new Date(appointment.date))}
+                            date={new Date(appointment.date)}
                             annotation={
                               <button
                                 className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-colors hover:bg-slate-200 dark:bg-slate-600 dark:text-slate-200 dark:hover:bg-slate-500 "

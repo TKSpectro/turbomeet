@@ -1,21 +1,24 @@
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 import * as React from 'react';
 
 export interface DateCardProps {
+  date: Date;
   annotation?: React.ReactNode;
-  day: string;
-  month: string;
-  dow: string;
   className?: string;
 }
 
-const DateCard: React.FunctionComponent<DateCardProps> = ({
-  annotation,
-  className,
-  day,
-  dow,
-  month,
-}) => {
+export const getDateProps = (date: Date) => {
+  const d = dayjs(date);
+  return {
+    day: d.format('D'),
+    dow: d.format('ddd'),
+    month: d.format('MMM'),
+  };
+};
+
+const DateCard: React.FunctionComponent<DateCardProps> = ({ annotation, className, date }) => {
+  const { day, dow, month } = getDateProps(date);
   return (
     <div
       className={clsx(
