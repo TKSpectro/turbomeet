@@ -8,7 +8,7 @@ import { appRouter } from '../../../server/trpc/router/_app';
 export default createNextApiHandler({
   router: appRouter,
   createContext,
-  onError: ({ error, ctx, input, path, req, type }) => {
+  onError: ({ error, path }) => {
     // if (error.code === 'NOT_FOUND') {
     //   // TODO if there is a prisma error thrown we always have to wrap/catch it
     //   // If its a 404 we can give out more information

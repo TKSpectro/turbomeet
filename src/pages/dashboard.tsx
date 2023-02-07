@@ -7,7 +7,7 @@ import { trpc } from '../utils/trpc';
 const Dashboard: NextPage = () => {
   const { data: meetings, isLoading } = trpc.meeting.getAll.useQuery();
 
-  const { data: meetingsToVoteOn, isLoading: isLoadingToVoteOn } = trpc.meeting.getAll.useQuery({
+  const { data: meetingsToVoteOn } = trpc.meeting.getAll.useQuery({
     haveToVote: true,
   });
 
