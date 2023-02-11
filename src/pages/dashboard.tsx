@@ -24,25 +24,29 @@ const Dashboard: NextPage = () => {
           Dashboard
         </h1>
 
-        <h2 className="mt-4 text-xl  font-bold leading-normal text-slate-200 lg:text-3xl">
-          Meetings you have to vote on
-        </h2>
-        {isLoading && <Loading width={200} height={200} />}
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {meetingsToVoteOn?.map((meeting) => (
-            <Link
-              key={meeting.id}
-              href={`/meeting/${meeting.id}`}
-              className="rounded-lg border-2 border-gray-800"
-            >
-              <div className="p-2">
-                <div className="text-lg font-semibold text-slate-100">{meeting.title}</div>
-                <div className="truncate">{meeting.description}</div>
-                <div className="text-slate-100">{meeting.deadline?.toLocaleString()}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {meetingsToVoteOn && meetingsToVoteOn.length > 0 && (
+          <>
+            <h2 className="mt-4 text-xl  font-bold leading-normal text-slate-200 lg:text-3xl">
+              Meetings you have to vote on
+            </h2>
+            {isLoading && <Loading width={200} height={200} />}
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {meetingsToVoteOn?.map((meeting) => (
+                <Link
+                  key={meeting.id}
+                  href={`/meeting/${meeting.id}`}
+                  className="rounded-lg border-2 border-gray-800"
+                >
+                  <div className="p-2">
+                    <div className="text-lg font-semibold text-slate-100">{meeting.title}</div>
+                    <div className="truncate">{meeting.description}</div>
+                    <div className="text-slate-100">{meeting.deadline?.toLocaleString()}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         <h2 className="mt-4 text-xl  font-bold leading-normal text-slate-200 lg:text-3xl">
           Upcoming meetings
