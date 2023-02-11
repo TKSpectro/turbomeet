@@ -30,21 +30,6 @@
   font-size: 13px;
   color: #a0a0a0;
 }
-.linear [cmdk-input] {
-  font-family: var(--font-sans);
-  border: none;
-  width: 100%;
-  font-size: 18px;
-  padding: 20px;
-  outline: none;
-  background: var(--bg);
-  color: #ededed;
-  border-bottom: 1px solid #e2e2e2;
-  border-radius: 0;
-  caret-color: #6e5ed2;
-  margin: 0;
-  margin-bottom: 8px;
-}
 .linear [cmdk-item] {
   content-visibility: auto;
   cursor: pointer;
@@ -62,7 +47,7 @@
   position: relative;
 }
 .linear [cmdk-item][aria-selected='true'] {
-  background: #232323;
+  background: rgb(17, 24, 39);
 }
 .linear [cmdk-item][aria-selected='true'] svg {
   color: #ededed;
@@ -74,7 +59,8 @@
   z-index: 123;
   width: 3px;
   height: 100%;
-  background: #5f6ad2;
+  border-radius: 4px;
+  background: rgb(243, 244, 246);
 }
 .linear [cmdk-item] + [cmdk-item] {
   margin-top: 4px;

@@ -30,6 +30,22 @@ export const meetingRouter = router({
         orderBy: { deadline: 'asc' },
       });
     }),
+  getAllForCmdK: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.meeting.findMany({
+      select: {
+        id: true,
+        title: true,
+      },
+      where: {
+        participants: {
+          some: {
+            id: ctx.session.user.id,
+          },
+        },
+      },
+      orderBy: { title: 'asc' },
+    });
+  }),
   getOne: protectedProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ ctx, input }) => {
