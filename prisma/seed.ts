@@ -226,6 +226,41 @@ async function main() {
       ++i;
     }
   }
+
+  let notVotedMeeting = await prisma.meeting.findFirst({
+    where: {
+      title: 'Seed Not Voted Meeting',
+    },
+  });
+  if (!notVotedMeeting) {
+    notVotedMeeting = await prisma.meeting.create({
+      data: {
+        title: 'Seed Not Voted Meeting',
+        description: 'This is a seeded not voting meeting',
+        owner: {
+          connect: {
+            id: user.id,
+          },
+        },
+        ownerUsername: user.name,
+        participants: {
+          connect: [{ id: user.id }, { id: user2.id }, { id: user3.id }],
+        },
+        appointments: {
+          createMany: {
+            data: [
+              { value: '2023-02-07T14:00:00.000Z/2023-02-07T15:30:00.000Z' },
+              { value: '2023-02-07T10:00:00.000Z/2023-02-07T11:30:00.000Z' },
+              { value: '2023-02-07T08:00:00.000Z/2023-02-07T09:30:00.000Z' },
+              { value: '2023-02-06T08:00:00.000Z/2023-02-06T09:30:00.000Z' },
+              { value: '2023-02-08T08:00:00.000Z/2023-02-08T09:30:00.000Z' },
+              { value: '2023-02-08T12:00:00.000Z/2023-02-08T13:30:00.000Z' },
+            ],
+          },
+        },
+      },
+    });
+  }
 }
 
 main()

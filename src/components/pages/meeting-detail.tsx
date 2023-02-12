@@ -13,6 +13,7 @@ import Head from 'next/head';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import type { RouterOutputs } from '../../utils/trpc';
+import { trpc } from '../../utils/trpc';
 import DateCard from '../meeting/date-card';
 import { Button, Loading } from '../ui';
 
@@ -105,6 +106,10 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
     });
   });
 
+  const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation();
+
+  const [votes, setVotes] = useState<{ [appointmentId: string]: Answer }>({});
+
   return (
     <>
       <Head>
@@ -115,6 +120,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
 
       <main className="max-w-full px-4 pt-4 md:w-[1024px] lg:min-h-[calc(100vh-64px)] ">
         {isLoading && <Loading width={200} height={200} />}
+
         {meeting && (
           <div>
             {adminView && (
@@ -244,13 +250,37 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                           return aAppIndex - bAppIndex;
                         })
                         .map((vote) => {
+                          // If the user has changed their answer we show that instead
+                          if (votes[vote.appointmentId] !== undefined) {
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                            vote.answer = votes[vote.appointmentId]!;
+                          }
+
                           return (
                             <div
                               key={vote.id}
                               className="flex justify-center"
                               style={{ width: columnWidth, minWidth: columnWidth }}
                             >
-                              <AnswerIcon answer={vote.answer} />
+                              <div
+                                className="rounded-md border border-gray-600 px-3 py-1"
+                                onClick={() => {
+                                  let newAnswer = vote.answer;
+                                  if (vote.answer === Answer.NO) {
+                                    newAnswer = Answer.YES;
+                                  } else if (vote.answer === Answer.YES) {
+                                    newAnswer = Answer.IFNECESSARY;
+                                  } else if (vote.answer === Answer.IFNECESSARY) {
+                                    newAnswer = Answer.NO;
+                                  }
+                                  setVotes((prev) => ({
+                                    ...prev,
+                                    [vote.appointmentId]: newAnswer,
+                                  }));
+                                }}
+                              >
+                                <AnswerIcon answer={vote.answer} />
+                              </div>
                             </div>
                           );
                         })}
@@ -268,6 +298,22 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                   );
                 })}
               </div>
+              <Button
+                disabled={saveVotesLoading || Object.keys(votes).length === 0}
+                onClick={() => {
+                  const mappedVotes = Object.entries(votes).map(([appointmentId, answer]) => ({
+                    appointmentId,
+                    answer,
+                  }));
+
+                  saveVotes({
+                    meetingId: meeting.id,
+                    votes: mappedVotes,
+                  });
+                }}
+              >
+                Save
+              </Button>
             </div>
           </div>
         )}

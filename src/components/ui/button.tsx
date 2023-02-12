@@ -21,6 +21,7 @@ export function Button({ children, variant = 'primary', fullWidth = false, ...pr
           'bg-danger': variant === 'danger',
           'bg-warning': variant === 'warning',
           'bg-info': variant === 'info',
+          'bg-gray-300 text-gray-500': props.disabled,
         },
         props.className ? props.className : '',
       )}

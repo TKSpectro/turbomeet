@@ -1,3 +1,4 @@
+import { Answer } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { zMeetingCreateInput } from '../../../types/zod-meeting';
@@ -151,5 +152,55 @@ export const meetingRouter = router({
           id: input.id,
         },
       });
+    }),
+  vote: protectedProcedure
+    .input(
+      z.object({
+        meetingId: z.string(),
+        votes: z.array(z.object({ appointmentId: z.string(), answer: z.nativeEnum(Answer) })),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const meeting = await ctx.prisma.meeting.findFirst({
+        where: { id: input.meetingId, participants: { some: { id: ctx.session.user.id } } },
+        include: {
+          appointments: {
+            where: { meetingId: input.meetingId },
+            include: {
+              votes: {
+                where: { userId: ctx.session.user.id, appointment: { meetingId: input.meetingId } },
+              },
+            },
+          },
+        },
+      });
+
+      if (!meeting) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Meeting not found',
+        });
+      }
+
+      const votes = input.votes.map((vote) => ({
+        id: meeting.appointments.find((a) => a.id === vote.appointmentId)?.votes[0]?.id || '1',
+        appointmentId: vote.appointmentId,
+        answer: vote.answer,
+        userId: ctx.session.user.id,
+        meetingId: input.meetingId,
+      }));
+
+      const result = [];
+      for (const vote of votes) {
+        result.push(
+          await ctx.prisma.vote.upsert({
+            where: {
+              id: vote.id,
+            },
+            create: { ...vote, id: undefined },
+            update: { answer: vote.answer },
+          }),
+        );
+      }
     }),
 });
