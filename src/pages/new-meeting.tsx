@@ -149,10 +149,9 @@ const NewMeeting: NextPage = () => {
               label="Date"
               onChange={(e) => {
                 setAppointments((oldDates) => {
-                  return [
-                    ...oldDates,
-                    `${new Date(e.target.valueAsDate || new Date()).toISOString()}`,
-                  ];
+                  const start = e.target.valueAsDate || new Date();
+                  const end = new Date(start.getTime() + 1000 * 60 * 60 * 1.5);
+                  return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
                 });
               }}
             />
