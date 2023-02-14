@@ -22,7 +22,9 @@ const Profile: NextPage = () => {
         <>
           Signed in as {session?.user?.name} <br />
           Email: {session?.user?.email} <br />
-          <Image src={session?.user?.image || ''} alt="Profile picture" width={100} height={100} />
+          {session?.user?.image && (
+            <Image src={session.user.image} alt="Profile picture" width={100} height={100} />
+          )}
           <Button variant="info" onClick={() => signOut({ callbackUrl: '/' })}>
             Sign out
           </Button>
