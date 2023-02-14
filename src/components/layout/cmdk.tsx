@@ -60,7 +60,7 @@ export function CmdK() {
         open={openCmdK}
         onOpenChange={setOpenCmdK}
         label="Global Command Menu"
-        className="linear linear-dark fixed top-1/2 left-1/2 max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-md bg-gray-800 p-6 text-gray-100"
+        className="linear linear-dark fixed top-1/2 left-1/2 z-[9999] max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-md bg-gray-800 p-6 text-gray-100"
         // style={{ background: 'linear-gradient(136.61deg, #27282b 13.72%, #2d2e31 74.3%)' }}
       >
         <Command.Input
