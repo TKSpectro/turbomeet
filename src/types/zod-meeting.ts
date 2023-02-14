@@ -6,3 +6,13 @@ export const zMeetingCreateInput = z.object({
   deadline: z.date().nullable(),
   appointments: z.string().array(),
 });
+
+export const zMeetingUpdateInput = z.object({
+  id: z.string(),
+  data: z.object({
+    title: z.string().min(1, { message: 'Must be at least 1 character long' }).optional(),
+    description: z.string().max(300, { message: 'Must be 300 or less characters long' }).optional(),
+    deadline: z.date().optional(),
+    closed: z.boolean().optional(),
+  }),
+});

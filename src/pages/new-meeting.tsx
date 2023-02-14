@@ -150,6 +150,11 @@ const NewMeeting: NextPage = () => {
               onChange={(e) => {
                 setAppointments((oldDates) => {
                   const start = e.target.valueAsDate || new Date();
+                  // If specific times are disabled, force the time to be 08am, so if the user toggles specific times on, the time will not be 01am
+                  if (!enableSpecificTimes) {
+                    start.setHours(8);
+                    start.setMinutes(0);
+                  }
                   const end = new Date(start.getTime() + 1000 * 60 * 60 * 1.5);
                   return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
                 });

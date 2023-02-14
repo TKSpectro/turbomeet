@@ -1,7 +1,7 @@
 import { Answer } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { zMeetingCreateInput } from '../../../types/zod-meeting';
+import { zMeetingCreateInput, zMeetingUpdateInput } from '../../../types/zod-meeting';
 import { protectedProcedure, router } from '../trpc';
 
 export const meetingRouter = router({
@@ -125,14 +125,12 @@ export const meetingRouter = router({
       },
     });
   }),
-  update: protectedProcedure
-    .input(z.object({ id: z.string(), data: z.object({}) }))
-    .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.meeting.update({
-        where: { id: input.id },
-        data: input.data,
-      });
-    }),
+  update: protectedProcedure.input(zMeetingUpdateInput).mutation(async ({ ctx, input }) => {
+    return await ctx.prisma.meeting.update({
+      where: { id: input.id },
+      data: input.data,
+    });
+  }),
   delete: protectedProcedure
     .input(z.object({ id: z.string(), titleRepeat: z.string() }))
     .mutation(async ({ ctx, input }) => {

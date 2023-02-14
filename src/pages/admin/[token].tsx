@@ -6,11 +6,22 @@ import { trpc } from '../../utils/trpc';
 const Admin: NextPage = () => {
   const router = useRouter();
   const { token } = router.query;
-  const { data: meeting, isLoading } = trpc.meeting.getOneAsAdmin.useQuery({
+  const {
+    data: meeting,
+    isLoading,
+    refetch,
+  } = trpc.meeting.getOneAsAdmin.useQuery({
     token: token?.toString() || '',
   });
 
-  return <MeetingDetailPage adminView={true} meeting={meeting} isLoading={isLoading} />;
+  return (
+    <MeetingDetailPage
+      adminView={true}
+      meeting={meeting}
+      isLoading={isLoading}
+      refetchMeeting={refetch}
+    />
+  );
 };
 
 export default Admin;

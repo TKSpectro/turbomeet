@@ -261,6 +261,90 @@ async function main() {
       },
     });
   }
+
+  {
+    let noSpecificTimeMeeting = await prisma.meeting.findFirst({
+      where: {
+        title: 'Seed No Specific Times Meeting',
+      },
+    });
+    if (!noSpecificTimeMeeting) {
+      noSpecificTimeMeeting = await prisma.meeting.create({
+        data: {
+          title: 'Seed No Specific Times Meeting',
+          description: 'This is a seeded meeting',
+          owner: {
+            connect: {
+              id: user.id,
+            },
+          },
+          ownerUsername: user.name,
+          participants: {
+            connect: [{ id: user.id }, { id: user2.id }, { id: user3.id }],
+          },
+          appointments: {
+            createMany: {
+              data: [
+                { value: '2023-02-07T08:00:00.000Z/' },
+                { value: '2023-02-06T08:00:00.000Z/' },
+                { value: '2023-02-08T08:00:00.000Z' },
+                { value: '2023-02-09T08:00:00.000Z' },
+                { value: '2023-02-10T08:00:00.000Z' },
+              ],
+            },
+          },
+        },
+      });
+    }
+
+    const noSpecificTimeAppointments = await prisma.appointment.findMany({
+      where: {
+        meetingId: noSpecificTimeMeeting.id,
+      },
+    });
+
+    const noSpecificTimeVotes = await prisma.vote.count({
+      where: {
+        meetingId: noSpecificTimeMeeting.id,
+      },
+    });
+
+    if (noSpecificTimeVotes === 0) {
+      for (const appointment of noSpecificTimeAppointments) {
+        const rand = Math.random();
+
+        let answerUser1: Answer = Answer.NO;
+        let answerUser2: Answer = Answer.NO;
+        if (rand < 0.333) {
+          answerUser1 = Answer.YES;
+          answerUser2 = Answer.NO;
+        } else if (rand < 0.666) {
+          answerUser1 = Answer.IFNECESSARY;
+          answerUser2 = Answer.IFNECESSARY;
+        } else {
+          answerUser1 = Answer.NO;
+          answerUser2 = Answer.YES;
+        }
+
+        await prisma.vote.createMany({
+          data: [
+            {
+              appointmentId: appointment.id,
+              meetingId: noSpecificTimeMeeting.id,
+              userId: user.id,
+              answer: answerUser1,
+            },
+            {
+              appointmentId: appointment.id,
+              meetingId: noSpecificTimeMeeting.id,
+              userId: user2.id,
+              answer: answerUser2,
+            },
+          ],
+        });
+      }
+    }
+  }
 }
 
 main()

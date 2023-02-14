@@ -3,6 +3,8 @@ import { Answer } from '@prisma/client';
 import {
   CheckCircledIcon,
   CrossCircledIcon,
+  LockClosedIcon,
+  LockOpen1Icon,
   MinusCircledIcon,
   PersonIcon,
   QuestionMarkCircledIcon,
@@ -24,6 +26,7 @@ type Props = {
   adminView: boolean;
   meeting: RouterOutputs['meeting']['getOne'] | null | undefined;
   isLoading: boolean;
+  refetchMeeting: () => Promise<unknown>;
 };
 
 const allowedAnswers = [
@@ -58,7 +61,7 @@ const AnswerIcon = ({ answer }: { answer?: string }) => {
   return <QuestionMarkCircledIcon className="h-5 w-5 text-gray-500" />;
 };
 
-export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
+export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeeting }: Props) {
   const [, copyToClipboard] = useCopyToClipboard();
 
   // columnWidth used for the participant/voting-table
@@ -108,6 +111,10 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
   });
 
   const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation();
+
+  const { mutate: updateMeeting } = trpc.meeting.update.useMutation({
+    onSuccess: () => refetchMeeting(),
+  });
 
   const [votes, setVotes] = useState<{ [appointmentId: string]: Answer }>({});
 
@@ -195,46 +202,65 @@ export function MeetingDetailPage({ adminView, meeting, isLoading }: Props) {
                     })}
                   </div>
                 </div>
+                {adminView && (
+                  <Button
+                    className="flex"
+                    onClick={() => {
+                      updateMeeting({ id: meeting.id, data: { closed: !meeting.closed } });
+                    }}
+                  >
+                    {meeting.closed ? (
+                      <>
+                        <LockOpen1Icon className="h-5 w-5" />
+                        Unlock
+                      </>
+                    ) : (
+                      <>
+                        <LockClosedIcon className="h-5 w-5" />
+                        Lock
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
 
-            {meeting.closed ||
-              (meeting.deadline && dayjs().isAfter(meeting.deadline) && (
-                <div className="card mt-4 p-4">
-                  <div className="mb-2 text-3xl font-semibold text-slate-100">Results</div>
-                  <div className="flex">
-                    {sortedAppointments
-                      .sort((a, b) => {
-                        if (a.votes[Answer.YES] === b.votes[Answer.YES]) {
-                          if (a.votes[Answer.IFNECESSARY] === b.votes[Answer.IFNECESSARY]) {
-                            return a.votes[Answer.NO] - b.votes[Answer.NO];
-                          }
-
-                          return b.votes[Answer.IFNECESSARY] - a.votes[Answer.IFNECESSARY];
+            {(meeting.closed || (meeting.deadline && dayjs().isAfter(meeting.deadline))) && (
+              <div className="card mt-4 p-4">
+                <div className="mb-2 text-3xl font-semibold text-slate-100">Results</div>
+                <div className="flex">
+                  {sortedAppointments
+                    .sort((a, b) => {
+                      if (a.votes[Answer.YES] === b.votes[Answer.YES]) {
+                        if (a.votes[Answer.IFNECESSARY] === b.votes[Answer.IFNECESSARY]) {
+                          return a.votes[Answer.NO] - b.votes[Answer.NO];
                         }
-                        return b.votes[Answer.YES] - a.votes[Answer.YES];
-                      })
-                      .slice(0, 5)
-                      .map((appointment) => (
-                        <div
-                          key={appointment.id}
-                          className="shrink-0 space-y-3 py-3 text-center"
-                          style={{ width: columnWidth }}
-                        >
-                          <DateCardDetails value={appointment.value} />
-                          {Object.values(Answer).map((answer, i) => {
-                            return (
-                              <div key={i} className="flex items-center justify-around px-4">
-                                <AnswerIcon answer={answer} />
-                                {appointment.votes[answer]}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ))}
-                  </div>
+
+                        return b.votes[Answer.IFNECESSARY] - a.votes[Answer.IFNECESSARY];
+                      }
+                      return b.votes[Answer.YES] - a.votes[Answer.YES];
+                    })
+                    .slice(0, 5)
+                    .map((appointment) => (
+                      <div
+                        key={appointment.id}
+                        className="shrink-0 space-y-3 py-3 text-center"
+                        style={{ width: columnWidth }}
+                      >
+                        <DateCardDetails value={appointment.value} />
+                        {Object.values(Answer).map((answer, i) => {
+                          return (
+                            <div key={i} className="flex items-center justify-around px-4">
+                              <AnswerIcon answer={answer} />
+                              {appointment.votes[answer]}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
                 </div>
-              ))}
+              </div>
+            )}
 
             <div className="card mt-4 overflow-x-auto p-4">
               <div className="flex py-2 pl-4 pr-2 font-medium" style={{ marginLeft: barWidth }}>
