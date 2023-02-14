@@ -40,7 +40,7 @@ export function CmdK() {
 
   return (
     <div>
-      <div className="relative mx-4 block">
+      <div className="relative block">
         <HiOutlineSearch className="pointer-events-none absolute top-1/2 left-3 h-6 w-6 -translate-y-1/2 transform" />
         <SlashIcon className="absolute top-1/2 right-3 h-6 w-6 -translate-y-1/2 rounded-lg border px-1" />
         <input

@@ -33,14 +33,14 @@ export function SideNav() {
         </Button>
       </div>
 
-      <CmdK />
-
       <nav
         className={clsx('flex-grow px-4 pb-4 md:block md:overflow-y-auto md:pb-0', {
           block: open,
           hidden: !open,
         })}
       >
+        <CmdK />
+
         {session && (
           <>
             <NavLink href="/dashboard">Dashboard</NavLink>
