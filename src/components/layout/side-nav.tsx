@@ -44,17 +44,18 @@ export function SideNav() {
         {session && (
           <>
             <NavLink href="/dashboard">Dashboard</NavLink>
-            <NavLink href="/meeting">Meeting</NavLink>
-            <NavLink href="/components">Components</NavLink>
+            <NavLink href="/new-meeting">New Meeting</NavLink>
             <NavLink href="/profile">Profile</NavLink>
           </>
         )}
         {!session && (
           <>
-            <NavLink href="/meeting">Meeting</NavLink>
+            <NavLink href="/new-meeting">New Meeting</NavLink>
             <NavLink href="/auth/login">Login</NavLink>
           </>
         )}
+
+        <NavLink href="/imprint">Imprint</NavLink>
       </nav>
       <div
         className={clsx(

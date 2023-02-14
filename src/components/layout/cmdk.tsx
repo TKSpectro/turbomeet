@@ -80,7 +80,7 @@ export function CmdK() {
           </Command.Item>
           <Command.Item
             onSelect={() => {
-              handleCmdKRoute('/meeting/');
+              handleCmdKRoute('/new-meeting/');
             }}
           >
             Create new meeting...

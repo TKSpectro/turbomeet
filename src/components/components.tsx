@@ -4,10 +4,12 @@ import Head from 'next/head';
 import { useForm } from 'react-hook-form';
 import { HiCurrencyEuro } from 'react-icons/hi';
 import { z } from 'zod';
-import { Button } from '../components/ui/button';
-import { Form } from '../components/ui/form';
-import { Input } from '../components/ui/input';
+import { Button } from './ui/button';
+import { Form } from './ui/form';
+import { Input } from './ui/input';
 
+// This is a helper page to show all components in one place
+// If you want to see them, move this file to src/pages
 const Components: NextPage = () => {
   const form = useForm({
     resolver: zodResolver(

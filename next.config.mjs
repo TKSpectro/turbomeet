@@ -14,5 +14,14 @@ const config = {
     defaultLocale: 'en',
   },
   images: { domains: ['avatars.githubusercontent.com'] },
+  async redirects() {
+    return [
+      {
+        source: '/meeting',
+        destination: '/dashboard',
+        permanent: true,
+      },
+    ];
+  },
 };
 export default config;

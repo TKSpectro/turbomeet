@@ -5,16 +5,16 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { HiOutlineX } from 'react-icons/hi';
-import AppointmentDropdown from '../../components/meeting/appointment-dropdown';
-import DateCard from '../../components/meeting/date-card';
-import { Switch } from '../../components/ui';
-import { Button } from '../../components/ui/button';
-import { Form, useZodForm } from '../../components/ui/form';
-import { Input } from '../../components/ui/input';
-import { zMeetingCreateInput } from '../../types/zod-meeting';
-import { trpc } from '../../utils/trpc';
+import AppointmentDropdown from '../components/meeting/appointment-dropdown';
+import DateCard from '../components/meeting/date-card';
+import { Switch } from '../components/ui';
+import { Button } from '../components/ui/button';
+import { Form, useZodForm } from '../components/ui/form';
+import { Input } from '../components/ui/input';
+import { zMeetingCreateInput } from '../types/zod-meeting';
+import { trpc } from '../utils/trpc';
 
-const Dashboard: NextPage = () => {
+const NewMeeting: NextPage = () => {
   const router = useRouter();
 
   const { mutate: createMeeting, error } = trpc.meeting.create.useMutation({
@@ -365,4 +365,4 @@ const Dashboard: NextPage = () => {
   );
 };
 
-export default Dashboard;
+export default NewMeeting;

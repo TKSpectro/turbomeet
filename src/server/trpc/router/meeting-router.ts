@@ -10,6 +10,8 @@ export const meetingRouter = router({
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.meeting.findMany({
         where: {
+          closed: input?.haveToVote === true ? false : undefined,
+          deadline: input?.haveToVote === true ? { gte: new Date() } : undefined,
           participants: {
             some: {
               id: ctx.session.user.id,
@@ -179,6 +181,13 @@ export const meetingRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Meeting not found',
+        });
+      }
+
+      if (meeting.closed || (meeting.deadline && meeting.deadline < new Date())) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Meeting deadline has passed',
         });
       }
 
