@@ -197,6 +197,18 @@ export const meetingRouter = router({
         meetingId: input.meetingId,
       }));
 
+      for (const appointment of meeting.appointments) {
+        if (votes.findIndex((v) => v.appointmentId === appointment.id) === -1) {
+          votes.push({
+            id: '1',
+            appointmentId: appointment.id,
+            answer: Answer.NO,
+            userId: ctx.session.user.id,
+            meetingId: input.meetingId,
+          });
+        }
+      }
+
       const result = [];
       for (const vote of votes) {
         result.push(

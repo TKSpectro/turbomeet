@@ -110,7 +110,9 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
     });
   });
 
-  const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation();
+  const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation({
+    onSuccess: () => refetchMeeting(),
+  });
 
   const { mutate: updateMeeting } = trpc.meeting.update.useMutation({
     onSuccess: () => refetchMeeting(),
@@ -350,15 +352,48 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                           );
                         })}
                       {participant.votes.length === 0 &&
-                        [...Array(meeting.appointments.length)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="flex justify-center"
-                            style={{ width: columnWidth, minWidth: columnWidth }}
-                          >
-                            <AnswerIcon />
-                          </div>
-                        ))}
+                        sortedAppointments.map((appointment, i) => {
+                          let vote: { appointmentId: string; answer: Answer };
+                          if (votes[appointment.id] !== undefined) {
+                            vote = {
+                              appointmentId: appointment.id,
+                              answer: votes[appointment.id] as Answer,
+                            };
+                          } else {
+                            vote = {
+                              appointmentId: appointment.id,
+                              answer: Answer.NO,
+                            };
+                          }
+
+                          return (
+                            <div
+                              key={i}
+                              className="flex justify-center"
+                              style={{ width: columnWidth, minWidth: columnWidth }}
+                            >
+                              <div
+                                className="rounded-md border border-gray-600 px-3 py-1"
+                                onClick={() => {
+                                  let newAnswer = vote.answer;
+                                  if (vote.answer === Answer.NO) {
+                                    newAnswer = Answer.YES;
+                                  } else if (vote.answer === Answer.YES) {
+                                    newAnswer = Answer.IFNECESSARY;
+                                  } else if (vote.answer === Answer.IFNECESSARY) {
+                                    newAnswer = Answer.NO;
+                                  }
+                                  setVotes((prev) => ({
+                                    ...prev,
+                                    [vote.appointmentId]: newAnswer,
+                                  }));
+                                }}
+                              >
+                                <AnswerIcon answer={votes[appointment.id]} />
+                              </div>
+                            </div>
+                          );
+                        })}
                     </div>
                   );
                 })}
