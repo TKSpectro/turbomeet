@@ -60,12 +60,11 @@ export function CmdK() {
         open={openCmdK}
         onOpenChange={setOpenCmdK}
         label="Global Command Menu"
-        className="linear linear-dark fixed top-1/2 left-1/2 z-[9999] max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-md bg-gray-800 p-6 text-gray-100"
-        // style={{ background: 'linear-gradient(136.61deg, #27282b 13.72%, #2d2e31 74.3%)' }}
+        className="linear linear-dark fixed top-1/2 left-1/2 z-[9999] max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-md border border-gray-500 bg-gray-50 p-6 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
       >
         <Command.Input
           placeholder="Search..."
-          className="mb-2 w-full rounded-md border-gray-600 bg-gray-900 p-4 text-white outline-none"
+          className="text-dark-800 mb-2 w-full rounded-md border border-gray-400 bg-gray-50 p-3 outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white"
           value={search}
           onValueChange={setSearch}
         />
