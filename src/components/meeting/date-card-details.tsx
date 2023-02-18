@@ -16,9 +16,9 @@ const DateCardDetails: React.FunctionComponent<DateCardDetailsProps> = ({ value,
       <DateCard date={start} />
       {end && (
         <div>
-          <div className="relative -mr-2 inline-block pr-2 text-right text-xs font-semibold after:absolute after:top-2 after:right-0 after:h-4 after:w-1 after:border-t after:border-r after:border-b after:border-slate-300 after:content-['']">
+          <div className="relative -mr-2 inline-block pr-2 text-right text-xs font-semibold after:absolute after:top-2 after:right-0 after:h-4 after:w-1 after:border-t after:border-r after:border-b after:border-gray-300 after:content-['']">
             <div>{start.toLocaleTimeString()}</div>
-            <div className="text-slate-400">{end.toLocaleTimeString()}</div>
+            <div className="text-gray-400">{end.toLocaleTimeString()}</div>
           </div>
         </div>
       )}

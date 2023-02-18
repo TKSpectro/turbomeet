@@ -26,7 +26,7 @@ const Dashboard: NextPage = () => {
 
         {meetingsToVoteOn && meetingsToVoteOn.length > 0 && (
           <>
-            <h2 className="mt-4 text-xl  font-bold leading-normal text-slate-200 lg:text-3xl">
+            <h2 className="mt-4 text-xl  font-bold leading-normal text-gray-200 lg:text-3xl">
               Meetings you have to vote on
             </h2>
             {isLoading && <Loading width={200} height={200} />}
@@ -38,9 +38,9 @@ const Dashboard: NextPage = () => {
                   className="rounded-lg border-2 border-gray-800"
                 >
                   <div className="p-2">
-                    <div className="text-lg font-semibold text-slate-100">{meeting.title}</div>
+                    <div className="text-lg font-semibold text-gray-100">{meeting.title}</div>
                     <div className="truncate">{meeting.description}</div>
-                    <div className="text-slate-100">{meeting.deadline?.toLocaleString()}</div>
+                    <div className="text-gray-100">{meeting.deadline?.toLocaleString()}</div>
                   </div>
                 </Link>
               ))}
@@ -48,7 +48,7 @@ const Dashboard: NextPage = () => {
           </>
         )}
 
-        <h2 className="mt-4 text-xl  font-bold leading-normal text-slate-200 lg:text-3xl">
+        <h2 className="mt-4 text-xl  font-bold leading-normal text-gray-200 lg:text-3xl">
           Upcoming meetings
         </h2>
         {isLoading && <Loading width={200} height={200} />}
@@ -60,9 +60,9 @@ const Dashboard: NextPage = () => {
               className="rounded-lg border-2 border-gray-800"
             >
               <div className="p-2">
-                <div className="text-lg font-semibold text-slate-100">{meeting.title}</div>
+                <div className="text-lg font-semibold text-gray-100">{meeting.title}</div>
                 <div className="truncate">{meeting.description}</div>
-                <div className="text-slate-100">{meeting.deadline?.toLocaleString()}</div>
+                <div className="text-gray-100">{meeting.deadline?.toLocaleString()}</div>
               </div>
             </Link>
           ))}

@@ -68,7 +68,10 @@ export function SideNav() {
       >
         <div className="flex items-center justify-between">
           <ThemeToggle />
-          <Link href="https://github.com/TKSpectro/turbomeet" className="">
+          <Link
+            href="https://github.com/TKSpectro/turbomeet"
+            aria-label="Github/TKSpectro/Turbomeet"
+          >
             <FiGithub className="float-right h-7 w-7" />
           </Link>
         </div>

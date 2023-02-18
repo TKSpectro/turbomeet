@@ -15,7 +15,7 @@ const Imprint: NextPage = () => {
           Imprint
         </h1>
 
-        <p className="mt-4 text-xl  font-bold leading-normal text-slate-200 lg:text-3xl">
+        <p className="mt-4 text-xl  font-bold leading-normal text-gray-200 lg:text-3xl">
           This is a demo app. No imprint is required.
         </p>
       </main>

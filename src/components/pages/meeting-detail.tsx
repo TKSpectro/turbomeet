@@ -136,22 +136,22 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
             {adminView && (
               <div className="card p-4">
                 <div className="mb-1 flex items-center justify-between">
-                  <div className="text-lg font-semibold dark:text-slate-100">Share via link</div>
+                  <div className="text-lg font-semibold dark:text-gray-100">Share via link</div>
                   <button
                     onClick={handleHide}
-                    className="h-8 items-center justify-center rounded-md px-3 text-slate-400 transition-colors hover:bg-slate-500/10 hover:text-slate-500 active:bg-slate-500/20"
+                    className="h-8 items-center justify-center rounded-md px-3 text-gray-400 transition-colors hover:bg-gray-500/10 hover:text-gray-500 active:bg-gray-500/20"
                   >
                     Hide
                   </button>
                 </div>
-                <div className="mb-2 dark:text-slate-100">
+                <div className="mb-2 dark:text-gray-100">
                   This link can be given to other participants to allow them to vote for an
                   appointment
                 </div>
                 <div className="relative">
                   <input
                     readOnly={true}
-                    className="mb-4 w-full rounded-md p-2 transition-all dark:bg-slate-700 dark:text-slate-100 md:mb-0 md:p-3 md:text-lg"
+                    className="mb-4 w-full rounded-md p-2 transition-all dark:bg-gray-700 dark:text-gray-100 md:mb-0 md:p-3 md:text-lg"
                     value={meetingUrl}
                   />
                   <Button
@@ -173,16 +173,16 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
 
             <div className="card mt-4 p-4">
               <div>
-                <div className="mb-2 text-3xl font-semibold text-slate-100">{meeting.title}</div>
-                <div className="mb-2 text-slate-300">
+                <div className="mb-2 text-3xl font-semibold text-gray-100">{meeting.title}</div>
+                <div className="mb-2 text-gray-300">
                   by {meeting.ownerUsername} • {dayjs(meeting.createdAt).fromNow()}
                 </div>
                 {meeting.description && (
-                  <div className="mb-2 text-slate-100">{meeting.description}</div>
+                  <div className="mb-2 text-gray-100">{meeting.description}</div>
                 )}
                 {meeting.deadline && (
                   <div
-                    className={clsx('mb-2 text-slate-100', {
+                    className={clsx('mb-2 text-gray-100', {
                       'text-red-500': dayjs().isAfter(meeting.deadline),
                     })}
                   >
@@ -229,7 +229,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
 
             {(meeting.closed || (meeting.deadline && dayjs().isAfter(meeting.deadline))) && (
               <div className="card mt-4 p-4">
-                <div className="mb-2 text-3xl font-semibold text-slate-100">Results</div>
+                <div className="mb-2 text-3xl font-semibold text-gray-100">Results</div>
                 <div className="flex">
                   {sortedAppointments
                     .sort((a, b) => {
@@ -289,9 +289,9 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                         className="flex justify-center"
                         style={{ width: columnWidth }}
                       >
-                        <div className="flex items-center justify-center rounded-full bg-slate-500/10 py-1 px-2">
-                          <PersonIcon className="h-6 w-6 text-slate-500" />
-                          <div className="text-slate-500">{appointment.votes[Answer.YES]}</div>
+                        <div className="flex items-center justify-center rounded-full bg-gray-500/10 py-1 px-2">
+                          <PersonIcon className="h-6 w-6 text-gray-500" />
+                          <div className="text-gray-500">{appointment.votes[Answer.YES]}</div>
                         </div>
                       </div>
                     );

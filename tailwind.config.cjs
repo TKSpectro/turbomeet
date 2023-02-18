@@ -9,11 +9,29 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: colors.indigo[400],
-        success: colors.green[400],
-        warning: colors.yellow[400],
-        danger: colors.red[400],
-        info: colors.emerald[400],
+        primary: colors.indigo[500],
+        success: colors.green[500],
+        warning: colors.yellow[500],
+        danger: colors.red[500],
+        info: colors.emerald[500],
+        gray: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+        },
+      },
+      ringColor: {
+        DEFAULT: colors.indigo[500],
+      },
+      fontFamily: {
+        lato: ['Lato', 'sans-serif'],
       },
     },
   },

@@ -31,7 +31,7 @@ const AppointmentDropdown: React.FunctionComponent<AppointmentDropdownProps> = (
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="text-md min-w-[220px] rounded-md bg-slate-800 p-2 leading-none">
+        <DropdownMenu.Content className="text-md min-w-[220px] rounded-md bg-gray-800 p-2 leading-none">
           <DropdownMenu.Item className="mb-2 flex items-center">
             <HiOutlineSparkles className="h-6 w-6 text-gray-800 dark:text-gray-200" />
             Apply all dates

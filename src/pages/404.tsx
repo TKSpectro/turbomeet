@@ -13,7 +13,7 @@ const NotFound: NextPage = () => {
       <main className="container mx-auto flex h-screen flex-col items-center justify-center p-4">
         <h1 className="text-3xl font-extrabold leading-normal text-gray-700 lg:text-6xl ">404</h1>
 
-        <p className="mt-4 text-xl font-bold leading-normal text-slate-200 lg:text-3xl">
+        <p className="mt-4 text-xl font-bold leading-normal text-gray-200 lg:text-3xl">
           Page not found
         </p>
       </main>
