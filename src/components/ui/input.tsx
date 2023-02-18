@@ -28,7 +28,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
           {...props}
         />
 
-        <div className="text-sm font-bold text-red-500">
+        <div className="text-sm font-bold text-danger">
           <>&nbsp;{error?.message}</>
         </div>
       </>
@@ -65,7 +65,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
         />
       </div>
       {!disableLabel && (
-        <div className="text-sm font-bold text-red-500">
+        <div className="text-sm font-bold text-danger">
           <>&nbsp;{error?.message}</>
         </div>
       )}

@@ -13,7 +13,7 @@ export function Button({ children, variant = 'primary', fullWidth = false, ...pr
       type="button"
       {...props}
       className={clsx(
-        `items-center justify-center rounded-md px-6 py-2 font-medium text-gray-800 hover:bg-opacity-90 disabled:cursor-not-allowed`,
+        `items-center justify-center rounded-md px-6 py-2 font-medium text-gray-900 hover:bg-opacity-90 disabled:cursor-not-allowed dark:text-white`,
         {
           'w-full': fullWidth,
           'bg-primary': variant === 'primary',

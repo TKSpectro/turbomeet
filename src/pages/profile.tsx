@@ -16,7 +16,7 @@ const Profile: NextPage = () => {
       </Head>
 
       <main className="container mx-auto flex flex-col items-center p-4">
-        <h1 className="text-5xl font-extrabold leading-normal text-gray-700 md:text-[5rem]">
+        <h1 className="text-5xl font-extrabold leading-normal text-gray-800 dark:text-gray-200 md:text-[5rem]">
           Profile
         </h1>
         <>
@@ -25,7 +25,7 @@ const Profile: NextPage = () => {
           {session?.user?.image && (
             <Image src={session.user.image} alt="Profile picture" width={100} height={100} />
           )}
-          <Button variant="info" onClick={() => signOut({ callbackUrl: '/' })}>
+          <Button variant="danger" onClick={() => signOut({ callbackUrl: '/' })} className="mt-2">
             Sign out
           </Button>
         </>

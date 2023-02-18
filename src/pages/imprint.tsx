@@ -11,11 +11,11 @@ const Imprint: NextPage = () => {
       </Head>
 
       <main className="container mx-auto flex h-screen flex-col items-center justify-center p-4">
-        <h1 className="text-3xl font-extrabold leading-normal text-gray-700 lg:text-6xl ">
+        <h1 className="text-3xl font-extrabold leading-normal text-gray-800 dark:text-gray-200 lg:text-6xl ">
           Imprint
         </h1>
 
-        <p className="mt-4 text-xl  font-bold leading-normal text-gray-200 lg:text-3xl">
+        <p className="mt-4 text-xl  font-bold leading-normal text-gray-600 dark:text-gray-400 lg:text-3xl">
           This is a demo app. No imprint is required.
         </p>
       </main>

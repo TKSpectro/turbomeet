@@ -9,10 +9,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: colors.indigo[500],
+        primary: colors.emerald[500],
         success: colors.green[500],
         warning: colors.yellow[500],
-        danger: colors.red[500],
+        danger: '#fe524f',
         info: colors.emerald[500],
         gray: {
           50: '#fafafa',

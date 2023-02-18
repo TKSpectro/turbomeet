@@ -33,17 +33,17 @@ const allowedAnswers = [
   {
     name: 'Yes',
     icon: CheckCircledIcon,
-    iconClassName: 'text-green-500',
+    iconClassName: 'text-success',
   },
   {
     name: 'If needed',
     icon: MinusCircledIcon,
-    iconClassName: 'text-yellow-500',
+    iconClassName: 'text-warning',
   },
   {
     name: 'No',
     icon: CrossCircledIcon,
-    iconClassName: 'text-red-500',
+    iconClassName: 'text-danger',
   },
 ];
 
@@ -55,7 +55,7 @@ const AnswerIcon = ({ answer }: { answer?: string }) => {
     return <MinusCircledIcon className="h-5 w-5 text-yellow-500" />;
   }
   if (answer === Answer.NO) {
-    return <CrossCircledIcon className="h-5 w-5 text-red-500" />;
+    return <CrossCircledIcon className="h-5 w-5 text-danger" />;
   }
 
   return <QuestionMarkCircledIcon className="h-5 w-5 text-gray-500" />;
@@ -183,7 +183,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                 {meeting.deadline && (
                   <div
                     className={clsx('mb-2 text-gray-100', {
-                      'text-red-500': dayjs().isAfter(meeting.deadline),
+                      'text-danger': dayjs().isAfter(meeting.deadline),
                     })}
                   >
                     Deadline: {meeting.deadline?.toLocaleDateString()}

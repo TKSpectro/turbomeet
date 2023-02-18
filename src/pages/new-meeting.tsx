@@ -106,7 +106,7 @@ const NewMeeting: NextPage = () => {
       </Head>
 
       <main className="container mx-auto flex flex-col items-center p-4">
-        <h1 className="text-5xl font-extrabold leading-normal text-gray-700 md:text-[5rem]">
+        <h1 className="text-5xl font-extrabold leading-normal text-gray-800 dark:text-gray-200 md:text-[5rem]">
           New Meeting
         </h1>
 
@@ -145,6 +145,7 @@ const NewMeeting: NextPage = () => {
 
           <div className={step === 1 ? '' : 'hidden'}>
             <Input
+              id="date"
               type={'date'}
               label="Date"
               onChange={(e) => {
@@ -217,6 +218,7 @@ const NewMeeting: NextPage = () => {
                                 return (
                                   <div key={timeIndex} className="flex items-center space-x-3">
                                     <Input
+                                      id="start-time"
                                       type={'time'}
                                       value={`${
                                         time.start.getHours() < 10 ? '0' : ''
@@ -233,6 +235,7 @@ const NewMeeting: NextPage = () => {
                                       disableLabel
                                     />
                                     <Input
+                                      id="end-time"
                                       type={'time'}
                                       value={`${
                                         time.end.getHours() < 10 ? '0' : ''
@@ -249,6 +252,7 @@ const NewMeeting: NextPage = () => {
                                       disableLabel
                                     />
                                     <Button
+                                      aria-label="Remove time option"
                                       onClick={() => {
                                         removeAppointmentTime(time.index);
                                       }}
@@ -312,8 +316,9 @@ const NewMeeting: NextPage = () => {
                             date={new Date(appointment.date)}
                             annotation={
                               <button
-                                className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 "
+                                className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-gray-800 transition-colors hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 "
                                 type="button"
+                                aria-label="Remove Appointment Date"
                                 onClick={() => {
                                   removeAppointment(index);
                                 }}
