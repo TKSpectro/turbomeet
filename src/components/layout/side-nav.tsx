@@ -50,7 +50,6 @@ export function SideNav() {
         )}
         {!session && (
           <>
-            <NavLink href="/new-meeting">New Meeting</NavLink>
             <NavLink href="/auth/login">Login</NavLink>
           </>
         )}
