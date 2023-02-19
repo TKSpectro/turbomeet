@@ -21,6 +21,11 @@ const config = {
         destination: '/dashboard',
         permanent: true,
       },
+      {
+        source: '/',
+        destination: '/dashboard',
+        permanent: true,
+      },
     ];
   },
 };

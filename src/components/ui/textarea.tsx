@@ -8,10 +8,11 @@ export interface Props extends ComponentProps<'textarea'> {
   error?: string;
   icon?: ReactNode;
   disableLabel?: boolean;
+  fullWidth?: boolean;
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, Props>(function Input(
-  { label, icon, disableLabel = false, ...props },
+  { label, icon, disableLabel = false, fullWidth = true, ...props },
   ref,
 ) {
   const {
@@ -39,9 +40,10 @@ export const TextArea = forwardRef<HTMLTextAreaElement, Props>(function Input(
         <textarea
           id={`textarea-${props.name}`}
           className={clsx(
-            'w-full rounded-md border bg-white py-2 text-gray-800 focus:border-primary focus:ring-primary dark:bg-gray-900 dark:text-gray-200',
+            'rounded-md border bg-white py-2 text-gray-800 focus:border-primary focus:ring-primary dark:bg-gray-900 dark:text-gray-200',
             icon && 'pl-12 pr-4 ',
             !icon && 'px-4',
+            fullWidth && 'w-full',
           )}
           ref={ref}
           {...props}

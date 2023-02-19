@@ -1,3 +1,4 @@
+import type { User } from '@prisma/client';
 import { Answer } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { createTransport } from 'nodemailer';
@@ -129,6 +130,15 @@ export const meetingRouter = router({
     if (input.participants) {
       for (const participant of input.participants) {
         if (!participants.some((value) => value.email === participant)) {
+          participants.push(
+            await ctx.prisma.user.create({
+              data: {
+                email: participant,
+                name: participant.split('@')[0],
+              },
+            }),
+          );
+
           try {
             const transporter = createTransport({
               url: process.env.EMAIL_SERVER,
@@ -143,15 +153,6 @@ export const meetingRouter = router({
           } catch (error) {
             console.error('Error while sending email', error);
           }
-
-          participants.push(
-            await ctx.prisma.user.create({
-              data: {
-                email: participant,
-                name: participant.split('@')[0],
-              },
-            }),
-          );
         }
       }
     }
@@ -182,9 +183,65 @@ export const meetingRouter = router({
     });
   }),
   update: protectedProcedure.input(zMeetingUpdateInput).mutation(async ({ ctx, input }) => {
+    const meeting = await ctx.prisma.meeting.findUnique({ where: { id: input.id } });
+    if (!meeting) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Meeting not found',
+      });
+    }
+
+    const oldParticipants = await ctx.prisma.user.findMany({
+      where: {
+        email: {
+          in: input.data.participants || [],
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    const newParticipants: User[] = [];
+
+    if (input.data.participants) {
+      for (const participant of input.data.participants) {
+        if (!oldParticipants.some((value) => value.email === participant)) {
+          newParticipants.push(
+            await ctx.prisma.user.create({
+              data: {
+                email: participant,
+                name: participant.split('@')[0],
+              },
+            }),
+          );
+
+          try {
+            const transporter = createTransport({
+              url: process.env.EMAIL_SERVER,
+            });
+
+            transporter.sendMail({
+              from: process.env.EMAIL_FROM,
+              to: participant,
+              subject: 'You have been invited to a meeting',
+              text: `You have been invited to the meeting ${meeting.title} by ${ctx.session.user.name}. As you currently have no account on this platform, you can create one by clicking on the following link: ${process.env.NEXTAUTH_URL}/auth/login. (Please use the same email address as you have been invited with.)`,
+            });
+          } catch (error) {
+            console.error('Error while sending email', error);
+          }
+        }
+      }
+    }
+
     return await ctx.prisma.meeting.update({
       where: { id: input.id },
-      data: input.data,
+      data: {
+        ...input.data,
+        participants: {
+          connect: newParticipants.map((p) => {
+            return { id: p.id };
+          }),
+        },
+      },
     });
   }),
   delete: protectedProcedure

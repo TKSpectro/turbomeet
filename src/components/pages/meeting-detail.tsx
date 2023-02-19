@@ -3,9 +3,11 @@ import { Answer } from '@prisma/client';
 import {
   CheckCircledIcon,
   CrossCircledIcon,
+  GearIcon,
   LockClosedIcon,
   LockOpen1Icon,
   MinusCircledIcon,
+  PaperPlaneIcon,
   PersonIcon,
   QuestionMarkCircledIcon,
 } from '@radix-ui/react-icons';
@@ -13,12 +15,16 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
+import { z } from 'zod';
 import type { RouterOutputs } from '../../utils/trpc';
 import { trpc } from '../../utils/trpc';
 import DateCardDetails from '../meeting/date-card-details';
 import { Button, Loading } from '../ui';
+import { Form, useZodForm } from '../ui/form';
+import { TextArea } from '../ui/textarea';
 
 dayjs.extend(relativeTime);
 
@@ -117,6 +123,19 @@ export function MeetingDetailPage({
     });
   });
 
+  const [participantText, setParticipantText] = useState<string>('');
+  const [participants, setParticipants] = useState<string[]>([]);
+  const meetingForm = useZodForm({
+    schema: z.object({
+      participants: z
+        .string()
+        .email({ message: 'Every comma separated text must be an email' })
+        .array()
+        .optional(),
+    }),
+    defaultValues: {},
+  });
+
   const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation({
     onSuccess: () => {
       refetchMeeting();
@@ -177,7 +196,7 @@ export function MeetingDetailPage({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="max-w-full px-4 pt-4 md:w-[1024px] lg:min-h-[calc(100vh-64px)] ">
+      <main className="mx-auto max-w-full px-8 pt-4 md:w-[1024px] lg:min-h-[calc(100vh-64px)]">
         {isLoading && <Loading width={200} height={200} />}
 
         {meeting && (
@@ -225,8 +244,38 @@ export function MeetingDetailPage({
 
             <div className="card mt-4 p-4">
               <div>
-                <div className="mb-2 text-3xl font-semibold text-gray-900 dark:text-gray-100">
-                  {meeting.title}
+                <div className="mb-2 flex justify-between text-gray-900 dark:text-gray-100">
+                  <div className="text-2xl font-semibold">{meeting.title}</div>
+                  {!adminView && meeting.ownerId === currentUser?.id && (
+                    <Link
+                      href={`/admin/${meeting.id}`}
+                      className="flex items-center justify-center rounded-md bg-primary px-2 py-1 font-medium text-gray-900 hover:bg-primary/80 disabled:cursor-not-allowed dark:text-white"
+                    >
+                      <GearIcon className="mr-2 h-5 w-5" />
+                      Manage
+                    </Link>
+                  )}
+                  {adminView && (
+                    <Button
+                      small
+                      className="mb-4 flex"
+                      onClick={() => {
+                        updateMeeting({ id: meeting.id, data: { closed: !meeting.closed } });
+                      }}
+                    >
+                      {meeting.closed ? (
+                        <>
+                          <LockOpen1Icon className="mr-2 h-5 w-5" />
+                          Unlock
+                        </>
+                      ) : (
+                        <>
+                          <LockClosedIcon className="mr-2 h-5 w-5" />
+                          Lock
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
                 <div className="mb-2 text-gray-700 dark:text-gray-300">
                   by {meeting.ownerUsername} • {dayjs(meeting.createdAt).fromNow()}
@@ -259,24 +308,48 @@ export function MeetingDetailPage({
                   </div>
                 </div>
                 {adminView && (
-                  <Button
-                    className="flex"
-                    onClick={() => {
-                      updateMeeting({ id: meeting.id, data: { closed: !meeting.closed } });
+                  <Form
+                    form={meetingForm}
+                    onSubmit={() => {
+                      updateMeeting({
+                        id: meeting.id,
+                        data: {
+                          participants: participants,
+                        },
+                      });
+                      setParticipantText('');
                     }}
                   >
-                    {meeting.closed ? (
-                      <>
-                        <LockOpen1Icon className="h-5 w-5" />
-                        Unlock
-                      </>
-                    ) : (
-                      <>
-                        <LockClosedIcon className="h-5 w-5" />
-                        Lock
-                      </>
-                    )}
-                  </Button>
+                    <div className="flex">
+                      <TextArea
+                        id="participants-textarea"
+                        error={meetingForm.formState.errors.participants?.message}
+                        onChange={(e) => {
+                          setParticipantText(e.target.value);
+                          const newValue = e.target.value?.split(',').map((p) => p.trim()) || [];
+                          const schema = z.string().email().array().optional();
+                          if (!schema.safeParse(newValue).success) {
+                            meetingForm.setError('participants', {
+                              message: 'Contains invalid email(s)',
+                            });
+                          } else {
+                            meetingForm.clearErrors('participants');
+                          }
+                          setParticipants(newValue);
+                        }}
+                        fullWidth={false}
+                        placeholder="Invite more participants. Add emails separated by commas"
+                        disableLabel
+                        value={participantText}
+                      />
+                      <div className="ml-4 self-center">
+                        <Button type="submit" className="flex" small>
+                          <PaperPlaneIcon className="mr-3 h-5 w-5" />
+                          Invite
+                        </Button>
+                      </div>
+                    </div>
+                  </Form>
                 )}
               </div>
             </div>

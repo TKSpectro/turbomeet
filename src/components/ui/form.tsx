@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import clsx from 'clsx';
 import type { ComponentProps } from 'react';
 import type { FieldValues, SubmitHandler, UseFormProps, UseFormReturn } from 'react-hook-form';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -20,13 +21,23 @@ export function useZodForm<TSchema extends z.ZodType>(
 interface Props<T extends FieldValues = never> extends Omit<ComponentProps<'form'>, 'onSubmit'> {
   form: UseFormReturn<T>;
   onSubmit: SubmitHandler<T>;
+  fullWidth?: boolean;
 }
 
-export const Form = <T extends FieldValues>({ form, onSubmit, children, ...props }: Props<T>) => {
+export const Form = <T extends FieldValues>({
+  form,
+  onSubmit,
+  children,
+  fullWidth = true,
+  ...props
+}: Props<T>) => {
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
-        <fieldset className="flex flex-col space-y-2" disabled={form.formState.isSubmitting}>
+        <fieldset
+          className={clsx({ 'flex flex-col space-y-2': fullWidth })}
+          disabled={form.formState.isSubmitting}
+        >
           {children}
         </fieldset>
       </form>
