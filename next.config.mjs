@@ -9,20 +9,11 @@
 const config = {
   reactStrictMode: true,
   swcMinify: true,
-  i18n: {
-    locales: ['en'],
-    defaultLocale: 'en',
-  },
   images: { domains: ['avatars.githubusercontent.com'] },
   async redirects() {
     return [
       {
         source: '/meeting',
-        destination: '/dashboard',
-        permanent: true,
-      },
-      {
-        source: '/',
         destination: '/dashboard',
         permanent: true,
       },
