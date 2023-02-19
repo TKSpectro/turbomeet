@@ -7,34 +7,41 @@ import { zMeetingCreateInput, zMeetingUpdateInput } from '../../../types/zod-mee
 import { protectedProcedure, router } from '../trpc';
 
 export const meetingRouter = router({
-  getAll: protectedProcedure
-    .input(z.object({ haveToVote: z.boolean().optional() }).optional())
-    .query(async ({ ctx, input }) => {
-      return await ctx.prisma.meeting.findMany({
-        where: {
-          closed: input?.haveToVote === true ? false : undefined,
-          deadline: input?.haveToVote === true ? { gte: new Date() } : undefined,
-          participants: {
-            some: {
-              id: ctx.session.user.id,
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.meeting.findMany({
+      where: {
+        participants: {
+          some: {
+            id: ctx.session.user.id,
+          },
+        },
+      },
+      orderBy: { deadline: 'asc' },
+    });
+  }),
+  getAllToVoteOn: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.meeting.findMany({
+      where: {
+        closed: false,
+        OR: [{ deadline: { gte: new Date() } }, { deadline: null }],
+        participants: {
+          some: {
+            id: ctx.session.user.id,
+          },
+        },
+        appointments: {
+          every: {
+            votes: {
+              none: {
+                userId: ctx.session.user.id,
+              },
             },
           },
-          appointments:
-            input?.haveToVote === true
-              ? {
-                  every: {
-                    votes: {
-                      none: {
-                        userId: ctx.session.user.id,
-                      },
-                    },
-                  },
-                }
-              : undefined,
         },
-        orderBy: { deadline: 'asc' },
-      });
-    }),
+      },
+      orderBy: { deadline: 'asc' },
+    });
+  }),
   getAllForCmdK: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.meeting.findMany({
       select: {

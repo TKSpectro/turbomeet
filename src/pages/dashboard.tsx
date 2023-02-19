@@ -23,9 +23,7 @@ const MeetingCard = ({ meeting }: { meeting: Meeting }) => {
 const Dashboard: NextPage = () => {
   const { data: meetings, isLoading } = trpc.meeting.getAll.useQuery();
 
-  const { data: meetingsToVoteOn } = trpc.meeting.getAll.useQuery({
-    haveToVote: true,
-  });
+  const { data: meetingsToVoteOn } = trpc.meeting.getAllToVoteOn.useQuery();
 
   return (
     <>
