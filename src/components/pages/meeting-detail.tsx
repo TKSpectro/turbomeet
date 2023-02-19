@@ -50,10 +50,10 @@ const allowedAnswers = [
 
 const AnswerIcon = ({ answer }: { answer?: string }) => {
   if (answer === Answer.YES) {
-    return <CheckCircledIcon className="h-5 w-5 text-green-500" />;
+    return <CheckCircledIcon className="h-5 w-5 text-success" />;
   }
   if (answer === Answer.IFNECESSARY) {
-    return <MinusCircledIcon className="h-5 w-5 text-yellow-500" />;
+    return <MinusCircledIcon className="h-5 w-5 text-warning" />;
   }
   if (answer === Answer.NO) {
     return <CrossCircledIcon className="h-5 w-5 text-danger" />;
@@ -129,6 +129,45 @@ export function MeetingDetailPage({
   });
 
   const [votes, setVotes] = useState<{ [appointmentId: string]: Answer }>({});
+
+  const VoteButton = ({
+    vote,
+    disabled,
+  }: {
+    vote: { appointmentId: string; answer: Answer | undefined };
+    disabled: boolean;
+  }) => {
+    return (
+      <div className="flex justify-center" style={{ width: columnWidth, minWidth: columnWidth }}>
+        <button
+          aria-label={`Current Vote ${vote.answer}`}
+          className={clsx('rounded-md px-3 py-1', {
+            'border border-gray-700 dark:border-gray-300': !disabled,
+            'bg-success/10': vote.answer === Answer.YES,
+            'bg-warning/10': vote.answer === Answer.IFNECESSARY,
+            'bg-danger/10': vote.answer === Answer.NO,
+          })}
+          disabled={disabled}
+          onClick={() => {
+            let newAnswer = vote.answer || Answer.NO;
+            if (vote.answer === Answer.NO) {
+              newAnswer = Answer.YES;
+            } else if (vote.answer === Answer.YES) {
+              newAnswer = Answer.IFNECESSARY;
+            } else if (vote.answer === Answer.IFNECESSARY) {
+              newAnswer = Answer.NO;
+            }
+            setVotes((prev) => ({
+              ...prev,
+              [vote.appointmentId]: newAnswer as Answer,
+            }));
+          }}
+        >
+          <AnswerIcon answer={vote.answer} />
+        </button>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -317,6 +356,12 @@ export function MeetingDetailPage({
               </div>
               <div className="items-center py-2 pl-4 pr-2 font-medium">
                 {meeting.participants.map((participant) => {
+                  const isDisabled =
+                    meeting.closed ||
+                    (meeting.deadline && dayjs().isAfter(meeting.deadline)) ||
+                    false ||
+                    participant.id !== currentUser?.id;
+
                   return (
                     <div key={participant.id} className="flex py-3">
                       <div className="shrink-0" style={{ width: barWidth }}>
@@ -333,7 +378,7 @@ export function MeetingDetailPage({
 
                           return aAppIndex - bAppIndex;
                         })
-                        .map((vote) => {
+                        .map((vote, i) => {
                           // If the user has changed their answer we show that instead
                           if (
                             participant.id === currentUser?.id &&
@@ -343,39 +388,7 @@ export function MeetingDetailPage({
                             vote.answer = votes[vote.appointmentId]!;
                           }
 
-                          return (
-                            <div
-                              key={vote.id}
-                              className="flex justify-center"
-                              style={{ width: columnWidth, minWidth: columnWidth }}
-                            >
-                              <button
-                                className="rounded-md border border-gray-600 px-3 py-1"
-                                disabled={
-                                  meeting.closed ||
-                                  (meeting.deadline && dayjs().isAfter(meeting.deadline)) ||
-                                  false ||
-                                  participant.id !== currentUser?.id
-                                }
-                                onClick={() => {
-                                  let newAnswer = vote.answer;
-                                  if (vote.answer === Answer.NO) {
-                                    newAnswer = Answer.YES;
-                                  } else if (vote.answer === Answer.YES) {
-                                    newAnswer = Answer.IFNECESSARY;
-                                  } else if (vote.answer === Answer.IFNECESSARY) {
-                                    newAnswer = Answer.NO;
-                                  }
-                                  setVotes((prev) => ({
-                                    ...prev,
-                                    [vote.appointmentId]: newAnswer,
-                                  }));
-                                }}
-                              >
-                                <AnswerIcon answer={vote.answer} />
-                              </button>
-                            </div>
-                          );
+                          return <VoteButton key={i} vote={vote} disabled={isDisabled} />;
                         })}
                       {participant.votes.length === 0 &&
                         sortedAppointments.map((appointment, i) => {
@@ -395,39 +408,7 @@ export function MeetingDetailPage({
                             };
                           }
 
-                          return (
-                            <div
-                              key={i}
-                              className="flex justify-center"
-                              style={{ width: columnWidth, minWidth: columnWidth }}
-                            >
-                              <button
-                                className="rounded-md border border-gray-600 px-3 py-1"
-                                disabled={
-                                  meeting.closed ||
-                                  (meeting.deadline && dayjs().isAfter(meeting.deadline)) ||
-                                  false ||
-                                  participant.id !== currentUser?.id
-                                }
-                                onClick={() => {
-                                  let newAnswer = vote.answer || Answer.NO;
-                                  if (vote.answer === Answer.NO) {
-                                    newAnswer = Answer.YES;
-                                  } else if (vote.answer === Answer.YES) {
-                                    newAnswer = Answer.IFNECESSARY;
-                                  } else if (vote.answer === Answer.IFNECESSARY) {
-                                    newAnswer = Answer.NO;
-                                  }
-                                  setVotes((prev) => ({
-                                    ...prev,
-                                    [vote.appointmentId]: newAnswer,
-                                  }));
-                                }}
-                              >
-                                <AnswerIcon answer={vote.answer} />
-                              </button>
-                            </div>
-                          );
+                          return <VoteButton key={i} vote={vote} disabled={isDisabled} />;
                         })}
                     </div>
                   );
