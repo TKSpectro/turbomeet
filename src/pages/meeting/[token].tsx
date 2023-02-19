@@ -10,9 +10,16 @@ const MeetingDetail: NextPage = () => {
     data: meeting,
     isLoading,
     refetch,
-  } = trpc.meeting.getOne.useQuery({
-    token: token?.toString() || '',
-  });
+  } = trpc.meeting.getOne.useQuery(
+    {
+      token: token?.toString() || '',
+    },
+    {
+      onError: () => {
+        router.push('/dashboard');
+      },
+    },
+  );
 
   const { data: user, isLoading: isLoadingUser } = trpc.user.me.useQuery();
 

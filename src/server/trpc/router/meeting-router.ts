@@ -52,7 +52,7 @@ export const meetingRouter = router({
   getOne: protectedProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.prisma.meeting.findFirst({
+      const meeting = await ctx.prisma.meeting.findFirst({
         where: { id: input.token, participants: { some: { id: ctx.session.user.id } } },
         include: {
           appointments: {
@@ -67,6 +67,15 @@ export const meetingRouter = router({
           },
         },
       });
+
+      if (!meeting) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Meeting not found',
+        });
+      }
+
+      return meeting;
     }),
   getOneAsAdmin: protectedProcedure
     .input(z.object({ token: z.string() }))
@@ -177,7 +186,7 @@ export const meetingRouter = router({
 
       if (!meeting) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
+          code: 'NOT_FOUND',
           message: 'Meeting not found',
         });
       }
@@ -198,7 +207,12 @@ export const meetingRouter = router({
       }));
 
       for (const appointment of meeting.appointments) {
-        if (votes.findIndex((v) => v.appointmentId === appointment.id) === -1) {
+        if (
+          votes.findIndex((v) => v.appointmentId === appointment.id) === -1 &&
+          appointment.votes.findIndex(
+            (v) => v.userId === ctx.session.user.id && v.appointmentId === appointment.id,
+          ) === -1
+        ) {
           votes.push({
             id: '1',
             appointmentId: appointment.id,

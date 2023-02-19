@@ -118,7 +118,10 @@ export function MeetingDetailPage({
   });
 
   const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation({
-    onSuccess: () => refetchMeeting(),
+    onSuccess: () => {
+      refetchMeeting();
+      setVotes({});
+    },
   });
 
   const { mutate: updateMeeting } = trpc.meeting.update.useMutation({
