@@ -1,5 +1,6 @@
 import { Answer } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
+import { createTransport } from 'nodemailer';
 import { z } from 'zod';
 import { zMeetingCreateInput, zMeetingUpdateInput } from '../../../types/zod-meeting';
 import { protectedProcedure, router } from '../trpc';
@@ -116,12 +117,58 @@ export const meetingRouter = router({
       deadline = new Date(input.deadline);
     }
 
+    const participants = await ctx.prisma.user.findMany({
+      where: {
+        email: {
+          in: input.participants || [],
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (input.participants) {
+      for (const participant of input.participants) {
+        if (!participants.some((value) => value.email === participant)) {
+          try {
+            const transporter = createTransport({
+              url: process.env.EMAIL_SERVER,
+            });
+
+            transporter.sendMail({
+              from: process.env.EMAIL_FROM,
+              to: participant,
+              subject: 'You have been invited to a meeting',
+              text: `You have been invited to the meeting ${input.title} by ${ctx.session.user.name}. As you currently have no account on this platform, you can create one by clicking on the following link: ${process.env.NEXTAUTH_URL}/auth/login. (Please use the same email address as you have been invited with.)`,
+            });
+          } catch (error) {
+            console.error('Error while sending email', error);
+          }
+
+          participants.push(
+            await ctx.prisma.user.create({
+              data: {
+                email: participant,
+                name: participant.split('@')[0],
+              },
+            }),
+          );
+        }
+      }
+    }
+
     return await ctx.prisma.meeting.create({
       data: {
         title: input.title,
         description: input.description,
         deadline: deadline,
-        participants: { connect: { id: ctx.session.user.id } },
+        participants: {
+          connect: [
+            { id: ctx.session.user.id },
+            ...participants.map((p) => {
+              return { id: p.id };
+            }),
+          ],
+        },
         owner: { connect: { id: ctx.session.user.id } },
         ownerUsername: ctx.session.user.name,
         appointments: {

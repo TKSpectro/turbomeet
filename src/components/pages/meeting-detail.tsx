@@ -365,7 +365,7 @@ export function MeetingDetailPage({
                   return (
                     <div key={participant.id} className="flex py-3">
                       <div className="shrink-0" style={{ width: barWidth }}>
-                        {participant.name}
+                        {participant.name || participant.email}
                       </div>
                       {participant.votes
                         .sort((a, b) => {

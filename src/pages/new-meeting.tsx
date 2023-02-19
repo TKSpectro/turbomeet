@@ -5,12 +5,14 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { HiOutlineX } from 'react-icons/hi';
+import { z } from 'zod';
 import AppointmentDropdown from '../components/meeting/appointment-dropdown';
 import DateCard from '../components/meeting/date-card';
 import { Switch } from '../components/ui';
 import { Button } from '../components/ui/button';
 import { Form, useZodForm } from '../components/ui/form';
 import { Input } from '../components/ui/input';
+import { TextArea } from '../components/ui/textarea';
 import { zMeetingCreateInput } from '../types/zod-meeting';
 import { trpc } from '../utils/trpc';
 
@@ -27,6 +29,7 @@ const NewMeeting: NextPage = () => {
     schema: zMeetingCreateInput,
     defaultValues: {
       appointments: [],
+      participants: [],
     },
   });
 
@@ -43,6 +46,7 @@ const NewMeeting: NextPage = () => {
     });
   };
 
+  const [participants, setParticipants] = useState<string[]>([]);
   const [appointments, setAppointments] = useState<string[]>([]);
 
   const [enableSpecificTimes, setEnableSpecificTimes] = useState(false);
@@ -124,6 +128,7 @@ const NewMeeting: NextPage = () => {
                   return date.split('/')[0] || date;
                 }
               }),
+              participants: participants,
             });
           }}
         >
@@ -138,6 +143,23 @@ const NewMeeting: NextPage = () => {
               label="Deadline"
               type="datetime-local"
               {...meetingForm.register('deadline', { value: null, valueAsDate: true })}
+            />
+
+            <TextArea
+              label="Participants"
+              error={meetingForm.formState.errors.participants?.message}
+              onChange={(e) => {
+                const newValue = e.target.value?.split(',').map((p) => p.trim()) || [];
+                const schema = z.string().email().array().optional();
+                if (!schema.safeParse(newValue).success) {
+                  meetingForm.setError('participants', {
+                    message: 'Contains invalid email(s)',
+                  });
+                } else {
+                  meetingForm.clearErrors('participants');
+                }
+                setParticipants(newValue);
+              }}
             />
 
             <Button onClick={stepForward}>Continue</Button>

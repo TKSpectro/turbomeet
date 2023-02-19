@@ -5,6 +5,11 @@ export const zMeetingCreateInput = z.object({
   description: z.string().max(300, { message: 'Must be 300 or less characters long' }).nullable(),
   deadline: z.date().nullable(),
   appointments: z.string().array(),
+  participants: z
+    .string()
+    .email({ message: 'Every comma separated text must be an email' })
+    .array()
+    .optional(),
 });
 
 export const zMeetingUpdateInput = z.object({
