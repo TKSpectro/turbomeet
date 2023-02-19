@@ -24,6 +24,7 @@ dayjs.extend(relativeTime);
 
 type Props = {
   adminView: boolean;
+  user: RouterOutputs['user']['me'] | null | undefined;
   meeting: RouterOutputs['meeting']['getOne'] | null | undefined;
   isLoading: boolean;
   refetchMeeting: () => Promise<unknown>;
@@ -61,7 +62,13 @@ const AnswerIcon = ({ answer }: { answer?: string }) => {
   return <QuestionMarkCircledIcon className="h-5 w-5 text-gray-500" />;
 };
 
-export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeeting }: Props) {
+export function MeetingDetailPage({
+  adminView,
+  meeting,
+  user: currentUser,
+  isLoading,
+  refetchMeeting,
+}: Props) {
   const [, copyToClipboard] = useCopyToClipboard();
 
   // columnWidth used for the participant/voting-table
@@ -136,22 +143,25 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
             {adminView && (
               <div className="card p-4">
                 <div className="mb-1 flex items-center justify-between">
-                  <div className="text-lg font-semibold dark:text-gray-100">Share via link</div>
+                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                    Share via link
+                  </div>
                   <button
                     onClick={handleHide}
-                    className="h-8 items-center justify-center rounded-md px-3 text-gray-400 transition-colors hover:bg-gray-500/10 hover:text-gray-500 active:bg-gray-500/20"
+                    className="h-8 items-center justify-center rounded-md px-3 text-gray-600 hover:bg-gray-500/10 hover:text-gray-500 active:bg-gray-500/20 dark:text-gray-400"
                   >
                     Hide
                   </button>
                 </div>
-                <div className="mb-2 dark:text-gray-100">
+                <div className="mb-2 text-gray-900 dark:text-gray-100">
                   This link can be given to other participants to allow them to vote for an
                   appointment
                 </div>
                 <div className="relative">
                   <input
-                    readOnly={true}
-                    className="mb-4 w-full rounded-md p-2 transition-all dark:bg-gray-700 dark:text-gray-100 md:mb-0 md:p-3 md:text-lg"
+                    aria-label="Shareable Meeting URL"
+                    readOnly
+                    className="mb-4 w-full rounded-md bg-gray-200 p-2 text-gray-900 dark:bg-gray-700 dark:text-gray-100 md:mb-0 md:p-3 md:text-lg"
                     value={meetingUrl}
                   />
                   <Button
@@ -173,16 +183,18 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
 
             <div className="card mt-4 p-4">
               <div>
-                <div className="mb-2 text-3xl font-semibold text-gray-100">{meeting.title}</div>
-                <div className="mb-2 text-gray-300">
+                <div className="mb-2 text-3xl font-semibold text-gray-900 dark:text-gray-100">
+                  {meeting.title}
+                </div>
+                <div className="mb-2 text-gray-700 dark:text-gray-300">
                   by {meeting.ownerUsername} • {dayjs(meeting.createdAt).fromNow()}
                 </div>
                 {meeting.description && (
-                  <div className="mb-2 text-gray-100">{meeting.description}</div>
+                  <div className="mb-2 text-gray-800 dark:text-gray-200">{meeting.description}</div>
                 )}
                 {meeting.deadline && (
                   <div
-                    className={clsx('mb-2 text-gray-100', {
+                    className={clsx('mb-2 text-gray-900 dark:text-gray-100', {
                       'text-danger': dayjs().isAfter(meeting.deadline),
                     })}
                   >
@@ -229,7 +241,9 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
 
             {(meeting.closed || (meeting.deadline && dayjs().isAfter(meeting.deadline))) && (
               <div className="card mt-4 p-4">
-                <div className="mb-2 text-3xl font-semibold text-gray-100">Results</div>
+                <div className="mb-2 text-3xl font-semibold text-gray-900 dark:text-gray-100">
+                  Results
+                </div>
                 <div className="flex">
                   {sortedAppointments
                     .sort((a, b) => {
@@ -318,7 +332,10 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                         })
                         .map((vote) => {
                           // If the user has changed their answer we show that instead
-                          if (votes[vote.appointmentId] !== undefined) {
+                          if (
+                            participant.id === currentUser?.id &&
+                            votes[vote.appointmentId] !== undefined
+                          ) {
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             vote.answer = votes[vote.appointmentId]!;
                           }
@@ -329,8 +346,14 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                               className="flex justify-center"
                               style={{ width: columnWidth, minWidth: columnWidth }}
                             >
-                              <div
+                              <button
                                 className="rounded-md border border-gray-600 px-3 py-1"
+                                disabled={
+                                  meeting.closed ||
+                                  (meeting.deadline && dayjs().isAfter(meeting.deadline)) ||
+                                  false ||
+                                  participant.id !== currentUser?.id
+                                }
                                 onClick={() => {
                                   let newAnswer = vote.answer;
                                   if (vote.answer === Answer.NO) {
@@ -347,14 +370,17 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                                 }}
                               >
                                 <AnswerIcon answer={vote.answer} />
-                              </div>
+                              </button>
                             </div>
                           );
                         })}
                       {participant.votes.length === 0 &&
                         sortedAppointments.map((appointment, i) => {
-                          let vote: { appointmentId: string; answer: Answer };
-                          if (votes[appointment.id] !== undefined) {
+                          let vote: { appointmentId: string; answer: Answer | undefined };
+                          if (
+                            participant.id === currentUser?.id &&
+                            votes[appointment.id] !== undefined
+                          ) {
                             vote = {
                               appointmentId: appointment.id,
                               answer: votes[appointment.id] as Answer,
@@ -362,7 +388,7 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                           } else {
                             vote = {
                               appointmentId: appointment.id,
-                              answer: Answer.NO,
+                              answer: undefined,
                             };
                           }
 
@@ -372,10 +398,16 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                               className="flex justify-center"
                               style={{ width: columnWidth, minWidth: columnWidth }}
                             >
-                              <div
+                              <button
                                 className="rounded-md border border-gray-600 px-3 py-1"
+                                disabled={
+                                  meeting.closed ||
+                                  (meeting.deadline && dayjs().isAfter(meeting.deadline)) ||
+                                  false ||
+                                  participant.id !== currentUser?.id
+                                }
                                 onClick={() => {
-                                  let newAnswer = vote.answer;
+                                  let newAnswer = vote.answer || Answer.NO;
                                   if (vote.answer === Answer.NO) {
                                     newAnswer = Answer.YES;
                                   } else if (vote.answer === Answer.YES) {
@@ -389,8 +421,8 @@ export function MeetingDetailPage({ adminView, meeting, isLoading, refetchMeetin
                                   }));
                                 }}
                               >
-                                <AnswerIcon answer={votes[appointment.id]} />
-                              </div>
+                                <AnswerIcon answer={vote.answer} />
+                              </button>
                             </div>
                           );
                         })}

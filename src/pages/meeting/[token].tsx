@@ -14,11 +14,14 @@ const MeetingDetail: NextPage = () => {
     token: token?.toString() || '',
   });
 
+  const { data: user, isLoading: isLoadingUser } = trpc.user.me.useQuery();
+
   return (
     <MeetingDetailPage
       adminView={false}
       meeting={meeting}
-      isLoading={isLoading}
+      user={user}
+      isLoading={isLoading || isLoadingUser}
       refetchMeeting={refetch}
     />
   );
