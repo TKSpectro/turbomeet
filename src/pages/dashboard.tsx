@@ -33,7 +33,7 @@ const Dashboard: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container mx-auto py-4 px-8">
+      <main className="container mx-auto px-8 pb-4 pt-6">
         <h1 className="text-3xl font-extrabold leading-normal text-gray-800 dark:text-gray-200 lg:text-6xl ">
           Dashboard
         </h1>

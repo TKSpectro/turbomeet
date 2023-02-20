@@ -10,7 +10,15 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container mx-auto flex h-screen flex-col items-center justify-center p-4"></main>
+      <main className="container mx-auto flex h-screen flex-col items-center justify-center p-4">
+        <h1 className="text-3xl font-extrabold leading-normal text-primary lg:text-6xl ">
+          turbomeet
+        </h1>
+
+        <p className="mt-4 text-xl  font-bold leading-normal text-gray-800 dark:text-gray-200 lg:text-3xl">
+          Your meeting planner, turbocharged
+        </p>
+      </main>
     </>
   );
 };

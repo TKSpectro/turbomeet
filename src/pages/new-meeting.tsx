@@ -60,11 +60,11 @@ const NewMeeting: NextPage = () => {
   const addAppointmentTime = (date: string) => {
     setAppointments((oldDates) => {
       const start = new Date(date.split('/')[0] || new Date());
-      start.setHours(12);
+      start.setHours(8);
       start.setMinutes(0);
 
       const end = new Date(
-        date.split('/')[1] || DateTime.fromJSDate(start).plus({ hours: 1 }).toJSDate(),
+        date.split('/')[1] || DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate(),
       );
 
       return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
@@ -77,15 +77,16 @@ const NewMeeting: NextPage = () => {
         if (i === dateIndex) {
           const start = new Date(oldDate.split('/')[0] || new Date());
           const end = new Date(
-            oldDate.split('/')[1] || DateTime.fromJSDate(start).plus({ hours: 1 }).toJSDate(),
+            oldDate.split('/')[1] ||
+              DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate(),
           );
 
           if (isStart) {
-            start.setHours(newDate?.getHours() || 12);
+            start.setHours(newDate?.getHours() || 8);
             start.setMinutes((newDate?.getMinutes() || 0) + new Date().getTimezoneOffset());
           } else {
-            end.setHours(newDate?.getHours() || 12);
-            end.setMinutes((newDate?.getMinutes() || 0) + new Date().getTimezoneOffset());
+            end.setHours(newDate?.getHours() || 9);
+            end.setMinutes((newDate?.getMinutes() || 30) + new Date().getTimezoneOffset());
           }
 
           return `${start.toISOString()}/${end.toISOString()}`;
@@ -148,6 +149,7 @@ const NewMeeting: NextPage = () => {
             <TextArea
               label="Participants"
               error={meetingForm.formState.errors.participants?.message}
+              placeholder="Invite more participants. Add emails separated by commas"
               onChange={(e) => {
                 const newValue = e.target.value?.split(',').map((p) => p.trim()) || [];
                 const schema = z.string().email().array().optional();
@@ -174,10 +176,10 @@ const NewMeeting: NextPage = () => {
                 setAppointments((oldDates) => {
                   const start = e.target.valueAsDate || new Date();
                   // If specific times are disabled, force the time to be 08am, so if the user toggles specific times on, the time will not be 01am
-                  if (!enableSpecificTimes) {
-                    start.setHours(8);
-                    start.setMinutes(0);
-                  }
+                  // if (!enableSpecificTimes) {
+                  start.setHours(8);
+                  start.setMinutes(0);
+                  // }
                   const end = new Date(start.getTime() + 1000 * 60 * 60 * 1.5);
                   return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
                 });
