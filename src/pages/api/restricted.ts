@@ -1,9 +1,9 @@
 import { type NextApiRequest, type NextApiResponse } from 'next';
-
-import { getServerAuthSession } from '../../server/common/get-server-auth-session';
+import { getServerSession } from 'next-auth';
+import { authOptions } from './auth/[...nextauth]';
 
 const restricted = async (req: NextApiRequest, res: NextApiResponse) => {
-  const session = await getServerAuthSession({ req, res });
+  const session = await getServerSession(req, res, authOptions);
 
   if (session) {
     res.send({
