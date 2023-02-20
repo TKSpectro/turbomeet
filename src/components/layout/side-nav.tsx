@@ -17,7 +17,7 @@ export function SideNav() {
     <aside className="sticky top-0 flex w-full flex-shrink-0 flex-col bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 md:h-screen md:w-64">
       <div className="flex flex-shrink-0 flex-row items-center justify-between px-8 py-4">
         <Link
-          href="/dashboard"
+          href={session ? '/dashboard' : '/'}
           className="focus:shadow-outline rounded-lg text-lg font-semibold uppercase tracking-widest text-primary focus:outline-none"
         >
           turbomeet
@@ -39,10 +39,9 @@ export function SideNav() {
           hidden: !open,
         })}
       >
-        <CmdK />
-
         {session && (
           <>
+            <CmdK />
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/new-meeting">New Meeting</NavLink>
             <NavLink href="/profile">Profile</NavLink>
