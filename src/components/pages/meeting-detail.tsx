@@ -97,9 +97,7 @@ export function MeetingDetailPage({
   })[] =
     meeting?.appointments
       .sort((a, b) => {
-        const start = new Date(a.value.split('/')[0] || '');
-        const startB = new Date(b.value.split('/')[0] || '');
-        return start.getTime() - startB.getTime();
+        return a.start.getTime() - b.start.getTime();
       })
       .map((a) => ({
         ...a,
@@ -378,7 +376,10 @@ export function MeetingDetailPage({
                         className="shrink-0 space-y-3 py-3 text-center"
                         style={{ width: columnWidth }}
                       >
-                        <DateCardDetails value={appointment.value} />
+                        <DateCardDetails
+                          start={appointment.start}
+                          end={appointment.end ?? undefined}
+                        />
                         {Object.values(Answer).map((answer, i) => {
                           return (
                             <div key={i} className="flex items-center justify-around px-4">
@@ -401,7 +402,7 @@ export function MeetingDetailPage({
                     className="shrink-0 space-y-3 py-3 text-center"
                     style={{ width: columnWidth }}
                   >
-                    <DateCardDetails value={appointment.value} />
+                    <DateCardDetails start={appointment.start} end={appointment.end ?? undefined} />
                   </div>
                 ))}
               </div>

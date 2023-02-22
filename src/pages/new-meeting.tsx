@@ -47,7 +47,7 @@ const NewMeeting: NextPage = () => {
   };
 
   const [participants, setParticipants] = useState<string[]>([]);
-  const [appointments, setAppointments] = useState<string[]>([]);
+  const [appointments, setAppointments] = useState<{ start: Date; end?: Date }[]>([]);
 
   const [enableSpecificTimes, setEnableSpecificTimes] = useState(false);
 
@@ -57,17 +57,14 @@ const NewMeeting: NextPage = () => {
     });
   };
 
-  const addAppointmentTime = (date: string) => {
+  const addAppointmentTime = (start: Date, end?: Date) => {
     setAppointments((oldDates) => {
-      const start = new Date(date.split('/')[0] || new Date());
       start.setHours(8);
       start.setMinutes(0);
 
-      const end = new Date(
-        date.split('/')[1] || DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate(),
-      );
+      end = end ?? DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate();
 
-      return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
+      return [...oldDates, { start, end }];
     });
   };
 
@@ -75,11 +72,9 @@ const NewMeeting: NextPage = () => {
     setAppointments((oldDates) => {
       return oldDates.map((oldDate, i) => {
         if (i === dateIndex) {
-          const start = new Date(oldDate.split('/')[0] || new Date());
-          const end = new Date(
-            oldDate.split('/')[1] ||
-              DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate(),
-          );
+          const start = oldDate.start;
+          const end =
+            oldDate.end ?? DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate();
 
           if (isStart) {
             start.setHours(newDate?.getHours() || 8);
@@ -89,7 +84,7 @@ const NewMeeting: NextPage = () => {
             end.setMinutes((newDate?.getMinutes() || 30) + new Date().getTimezoneOffset());
           }
 
-          return `${start.toISOString()}/${end.toISOString()}`;
+          return { start, end };
         }
         return oldDate;
       });
@@ -126,7 +121,8 @@ const NewMeeting: NextPage = () => {
                 if (enableSpecificTimes) {
                   return date;
                 } else {
-                  return date.split('/')[0] || date;
+                  // If specific times are disabled, force end to be not set
+                  return { start: date.start };
                 }
               }),
               participants: participants,
@@ -175,13 +171,14 @@ const NewMeeting: NextPage = () => {
               onChange={(e) => {
                 setAppointments((oldDates) => {
                   const start = e.target.valueAsDate || new Date();
+
                   // If specific times are disabled, force the time to be 08am, so if the user toggles specific times on, the time will not be 01am
-                  // if (!enableSpecificTimes) {
                   start.setHours(8);
                   start.setMinutes(0);
-                  // }
-                  const end = new Date(start.getTime() + 1000 * 60 * 60 * 1.5);
-                  return [...oldDates, `${start.toISOString()}/${end.toISOString()}`];
+
+                  const end = DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate();
+
+                  return [...oldDates, { start, end }];
                 });
               }}
             />
@@ -208,8 +205,10 @@ const NewMeeting: NextPage = () => {
                   <div className="divide-y">
                     {appointments
                       .reduce((acc, date, index) => {
-                        const start = new Date(date.split('/')[0] || '');
-                        const end = new Date(date.split('/')[1] || '');
+                        const start = date.start;
+                        const end =
+                          date.end ??
+                          DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate();
 
                         const shortDate = `${start.toISOString().split('T')[0]}`;
 
@@ -290,7 +289,7 @@ const NewMeeting: NextPage = () => {
                               <div className="flex items-center space-x-3">
                                 <Button
                                   onClick={() => {
-                                    addAppointmentTime(appointment.date);
+                                    addAppointmentTime(new Date(appointment.date));
                                   }}
                                 >
                                   Add time option
@@ -314,8 +313,10 @@ const NewMeeting: NextPage = () => {
                   >
                     {appointments
                       .reduce((acc, date, index) => {
-                        const start = new Date(date.split('/')[0] || '');
-                        const end = new Date(date.split('/')[1] || '');
+                        const start = date.start;
+                        const end =
+                          date.end ??
+                          DateTime.fromJSDate(start).plus({ hours: 1, minutes: 30 }).toJSDate();
 
                         const shortDate = `${start.toISOString().split('T')[0]}`;
 

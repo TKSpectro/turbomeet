@@ -181,9 +181,7 @@ export const meetingRouter = router({
         ownerUsername: ctx.session.user.name,
         appointments: {
           createMany: {
-            data: input.appointments?.map((value) => ({
-              value,
-            })),
+            data: input.appointments,
           },
         },
       },

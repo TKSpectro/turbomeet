@@ -89,7 +89,8 @@ model Appointment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  value String
+  start DateTime
+  end   DateTime?
 
   votes Vote[]
 

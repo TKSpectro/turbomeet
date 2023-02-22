@@ -1,14 +1,11 @@
 import DateCard from './date-card';
 
 export interface DateCardDetailsProps {
-  value: string;
+  start: Date;
+  end?: Date;
 }
 
-const DateCardDetails = ({ value }: DateCardDetailsProps) => {
-  const start = new Date(value.split('/')[0] || '');
-  const endDate = value.split('/')[1];
-  const end = endDate ? new Date(endDate) : undefined;
-
+const DateCardDetails = ({ start, end }: DateCardDetailsProps) => {
   return (
     <>
       <DateCard date={start} />
