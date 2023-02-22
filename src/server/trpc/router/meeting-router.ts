@@ -344,11 +344,4 @@ export const meetingRouter = router({
         );
       }
     }),
-  sendMail: protectedProcedure.mutation(async ({ ctx }) => {
-    await sendMail('INVITE', 'user@turbomeet.xyz', {
-      meetingTitle: 'Meeting Title',
-      inviteeName: 'Invitee Name',
-    });
-    return;
-  }),
 });

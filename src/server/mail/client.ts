@@ -15,7 +15,7 @@ const sendMail = async (
     url: process.env.EMAIL_SERVER,
   });
 
-  const { html, subject, text } = TEMPLATES[template](data as any);
+  const { html, subject, text } = TEMPLATES[template](data as never);
 
   let info;
   try {
