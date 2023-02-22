@@ -284,7 +284,7 @@ export function MeetingDetailPage({
                 {meeting.deadline && (
                   <div
                     className={clsx('mb-2 text-gray-900 dark:text-gray-100', {
-                      'text-danger': dayjs().isAfter(meeting.deadline),
+                      'text-danger dark:text-danger': dayjs().isAfter(meeting.deadline),
                     })}
                   >
                     Deadline: {meeting.deadline?.toLocaleDateString()}

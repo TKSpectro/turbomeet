@@ -10,6 +10,8 @@ export const meetingRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.meeting.findMany({
       where: {
+        closed: false,
+        OR: [{ deadline: { gte: new Date() } }, { deadline: null }],
         participants: {
           some: {
             id: ctx.session.user.id,
@@ -36,6 +38,19 @@ export const meetingRouter = router({
                 userId: ctx.session.user.id,
               },
             },
+          },
+        },
+      },
+      orderBy: { deadline: 'asc' },
+    });
+  }),
+  getAllFinished: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.meeting.findMany({
+      where: {
+        OR: [{ closed: true }, { deadline: { lt: new Date() } }],
+        participants: {
+          some: {
+            id: ctx.session.user.id,
           },
         },
       },

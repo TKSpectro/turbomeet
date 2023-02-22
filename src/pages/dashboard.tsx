@@ -25,6 +25,8 @@ const Dashboard: NextPage = () => {
 
   const { data: meetingsToVoteOn } = trpc.meeting.getAllToVoteOn.useQuery();
 
+  const { data: meetingsPrevious } = trpc.meeting.getAllFinished.useQuery();
+
   return (
     <>
       <Head>
@@ -61,6 +63,20 @@ const Dashboard: NextPage = () => {
             <MeetingCard meeting={meeting} key={meeting.id} />
           ))}
         </div>
+
+        {meetingsPrevious && meetingsPrevious.length > 0 && (
+          <>
+            <h2 className="mt-4 text-xl font-bold leading-normal text-gray-700 dark:text-gray-300 lg:text-3xl">
+              Previous meetings
+            </h2>
+            {isLoading && <Loading width={200} height={200} />}
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {meetingsPrevious?.map((meeting) => (
+                <MeetingCard meeting={meeting} key={meeting.id} />
+              ))}
+            </div>
+          </>
+        )}
       </main>
     </>
   );
