@@ -33,6 +33,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/login',
     verifyRequest: '/auth/verify-request',
+    error: '/auth/error',
   },
 };
 

@@ -1,20 +1,37 @@
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getServerSession } from 'next-auth';
-import { getCsrfToken, getProviders, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { authOptions } from '../api/auth/[...nextauth]';
 
-const Login = ({
-  csrfToken,
-  providers,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ERROR_CODES: { [key: string]: string } = {
+  OAuthSignin: 'There was an error signing in with OAuth.',
+  OAuthCallback: 'There was an error signing in with OAuth.',
+  OAuthCreateAccount: 'There was an error creating an account with OAuth.',
+  EmailCreateAccount: 'There was an error creating an account with email.',
+  Callback: 'There was an error signing in.',
+  OAuthAccountNotLinked:
+    'This account is already linked to an existing account, but not with this provider.',
+  EmailSignin: 'There was an error signing in with email.',
+  CredentialsSignin: 'There was an error signing in with credentials.',
+  SessionRequired: 'You must be signed in to access this resource.',
+  Default: 'An error has occurred. Please try again.',
+};
+
+const Login = ({}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
   const { theme } = useTheme();
   const isLight = theme === 'light';
 
   const [email, setEmail] = useState('');
+
+  const { error: errorParam } = router.query;
+  const error = errorParam ? ERROR_CODES[errorParam as string] : undefined;
 
   return (
     <>
@@ -28,6 +45,12 @@ const Login = ({
         <div className="w-full max-w-sm rounded-lg bg-gray-200/70 shadow dark:bg-gray-700/30">
           <form className="p-4 md:p-5 lg:p-6">
             <div className="grid gap-y-3">
+              {error && (
+                <div className="flex items-center justify-start gap-x-2 rounded-md bg-red-50 p-2 text-red-900 dark:bg-red-900/20 dark:text-red-50">
+                  <ExclamationTriangleIcon className="h-6 w-6 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
               <button
                 type="button"
                 className="flex items-center justify-center gap-x-2 rounded-md border border-gray-400 bg-gray-50 py-3 px-4 text-gray-900 transition hover:text-emerald-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50 dark:hover:text-emerald-400"
@@ -123,12 +146,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return { redirect: { destination: '/dashboard' } };
   }
 
-  const providers = await getProviders();
-  const csrfToken = await getCsrfToken(context);
   return {
-    props: {
-      providers,
-      csrfToken,
-    },
+    props: {},
   };
 }
