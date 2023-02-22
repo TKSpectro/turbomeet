@@ -1,9 +1,9 @@
 import type { User } from '@prisma/client';
 import { Answer } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
-import { createTransport } from 'nodemailer';
 import { z } from 'zod';
 import { zMeetingCreateInput, zMeetingUpdateInput } from '../../../types/zod-meeting';
+import { sendMail } from '../../mail/client';
 import { protectedProcedure, router } from '../trpc';
 
 export const meetingRouter = router({
@@ -66,6 +66,7 @@ export const meetingRouter = router({
         include: {
           appointments: {
             where: { meetingId: input.token },
+            orderBy: { start: 'asc' },
           },
           participants: {
             include: {
@@ -134,6 +135,24 @@ export const meetingRouter = router({
       },
     });
 
+    const meeting = await ctx.prisma.meeting.create({
+      data: {
+        title: input.title,
+        description: input.description,
+        deadline: deadline,
+        participants: {
+          connect: [{ id: ctx.session.user.id }],
+        },
+        owner: { connect: { id: ctx.session.user.id } },
+        ownerUsername: ctx.session.user.name,
+        appointments: {
+          createMany: {
+            data: input.appointments,
+          },
+        },
+      },
+    });
+
     if (input.participants) {
       for (const participant of input.participants) {
         if (!participants.some((value) => value.email === participant)) {
@@ -146,46 +165,30 @@ export const meetingRouter = router({
             }),
           );
 
-          try {
-            const transporter = createTransport({
-              url: process.env.EMAIL_SERVER,
-            });
-
-            transporter.sendMail({
-              from: process.env.EMAIL_FROM,
-              to: participant,
-              subject: 'You have been invited to a meeting',
-              text: `You have been invited to the meeting ${input.title} by ${ctx.session.user.name}. As you currently have no account on this platform, you can create one by clicking on the following link: ${process.env.NEXTAUTH_URL}/auth/login. (Please use the same email address as you have been invited with.)`,
-            });
-          } catch (error) {
-            console.error('Error while sending email', error);
-          }
+          sendMail('INVITE_NO_ACCOUNT', participant, {
+            meetingTitle: meeting.title,
+            inviteeName: ctx.session.user.name ?? '',
+          });
+        } else {
+          sendMail('INVITE', participant, {
+            meetingTitle: meeting.title,
+            inviteeName: ctx.session.user.name ?? '',
+            meetingToken: meeting.id,
+          });
         }
       }
     }
 
-    return await ctx.prisma.meeting.create({
+    await ctx.prisma.meeting.update({
+      where: { id: meeting.id },
       data: {
-        title: input.title,
-        description: input.description,
-        deadline: deadline,
         participants: {
-          connect: [
-            { id: ctx.session.user.id },
-            ...participants.map((p) => {
-              return { id: p.id };
-            }),
-          ],
-        },
-        owner: { connect: { id: ctx.session.user.id } },
-        ownerUsername: ctx.session.user.name,
-        appointments: {
-          createMany: {
-            data: input.appointments,
-          },
+          connect: participants.map((participant) => ({ id: participant.id })),
         },
       },
     });
+
+    return meeting;
   }),
   update: protectedProcedure.input(zMeetingUpdateInput).mutation(async ({ ctx, input }) => {
     const meeting = await ctx.prisma.meeting.findUnique({ where: { id: input.id } });
@@ -219,20 +222,16 @@ export const meetingRouter = router({
             }),
           );
 
-          try {
-            const transporter = createTransport({
-              url: process.env.EMAIL_SERVER,
-            });
-
-            transporter.sendMail({
-              from: process.env.EMAIL_FROM,
-              to: participant,
-              subject: 'You have been invited to a meeting',
-              text: `You have been invited to the meeting ${meeting.title} by ${ctx.session.user.name}. As you currently have no account on this platform, you can create one by clicking on the following link: ${process.env.NEXTAUTH_URL}/auth/login. (Please use the same email address as you have been invited with.)`,
-            });
-          } catch (error) {
-            console.error('Error while sending email', error);
-          }
+          sendMail('INVITE_NO_ACCOUNT', participant, {
+            meetingTitle: meeting.title,
+            inviteeName: ctx.session.user.name ?? '',
+          });
+        } else {
+          sendMail('INVITE', participant, {
+            meetingTitle: meeting.title,
+            inviteeName: ctx.session.user.name ?? '',
+            meetingToken: meeting.id,
+          });
         }
       }
     }
@@ -345,4 +344,11 @@ export const meetingRouter = router({
         );
       }
     }),
+  sendMail: protectedProcedure.mutation(async ({ ctx }) => {
+    await sendMail('INVITE', 'user@turbomeet.xyz', {
+      meetingTitle: 'Meeting Title',
+      inviteeName: 'Invitee Name',
+    });
+    return;
+  }),
 });
