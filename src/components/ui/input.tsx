@@ -55,7 +55,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
         <input
           id={`input-${props.name}`}
           className={clsx(
-            'w-full rounded-md border bg-white py-2 text-gray-800 focus:border-primary focus:ring-primary dark:bg-gray-900 dark:text-gray-200',
+            'w-full rounded-md border bg-white py-2 text-gray-800 read-only:cursor-not-allowed read-only:text-gray-500 dark:bg-gray-900 dark:text-gray-200 dark:read-only:text-gray-500',
             icon && 'pl-12 pr-4 ',
             !icon && 'px-4',
           )}

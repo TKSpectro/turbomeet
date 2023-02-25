@@ -44,7 +44,12 @@ const Profile: NextPage = () => {
             }}
           >
             <Input label="Name" {...profileForm.register('name')} />
-            <Input label="Email - (Can't change)" readOnly value={session?.user?.email ?? ''} />
+            <Input
+              label="Email - (Can't change)"
+              readOnly
+              disabled
+              value={session?.user?.email ?? ''}
+            />
 
             <Button
               type="submit"

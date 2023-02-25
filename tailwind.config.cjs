@@ -28,7 +28,7 @@ module.exports = {
         },
       },
       ringColor: {
-        DEFAULT: colors.indigo[500],
+        DEFAULT: colors.emerald[500],
       },
       fontFamily: {
         lato: ['Lato', 'sans-serif'],
