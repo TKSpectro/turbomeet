@@ -16,19 +16,26 @@ const MeetingDetail: NextPage = () => {
     },
     {
       onError: () => {
-        router.push('/dashboard');
+        if (user) {
+          router.push('/dashboard');
+        } else {
+          router.push('/auth/login');
+        }
       },
     },
   );
 
-  const { data: user, isLoading: isLoadingUser } = trpc.user.me.useQuery();
+  const { data: user, isLoading: isLoadingUser } = trpc.user.me.useQuery(undefined, {
+    retry: false,
+  });
 
   return (
     <MeetingDetailPage
       adminView={false}
       meeting={meeting}
       user={user}
-      isLoading={isLoading || isLoadingUser}
+      isLoading={isLoading}
+      isLoadingUser={isLoadingUser}
       refetchMeeting={refetch}
     />
   );

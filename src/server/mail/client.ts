@@ -1,9 +1,10 @@
 import { createTransport } from 'nodemailer';
-import { invite, inviteNoAccount } from './templates';
+import { invite, inviteNoAccount, votedPublicMeetingNoAccount } from './templates';
 
 const TEMPLATES = {
   INVITE: invite,
   INVITE_NO_ACCOUNT: inviteNoAccount,
+  VOTED_PUBLIC_MEETING_NO_ACCOUNT: votedPublicMeetingNoAccount,
 } as const;
 
 const sendMail = async (

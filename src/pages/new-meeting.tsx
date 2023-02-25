@@ -8,6 +8,7 @@ import { HiOutlineX } from 'react-icons/hi';
 import { z } from 'zod';
 import AppointmentDropdown from '../components/meeting/appointment-dropdown';
 import DateCard from '../components/meeting/date-card';
+import { PublicSwitch } from '../components/meeting/public-switch';
 import { Switch } from '../components/ui';
 import { Button } from '../components/ui/button';
 import { Form, useZodForm } from '../components/ui/form';
@@ -28,6 +29,7 @@ const NewMeeting: NextPage = () => {
   const meetingForm = useZodForm({
     schema: zMeetingCreateInput,
     defaultValues: {
+      public: false,
       appointments: [],
       participants: [],
     },
@@ -117,6 +119,7 @@ const NewMeeting: NextPage = () => {
               title: meetingForm.getValues('title'),
               description: meetingForm.getValues('description'),
               deadline: meetingForm.getValues('deadline'),
+              public: meetingForm.getValues('public'),
               appointments: appointments.map((date) => {
                 if (enableSpecificTimes) {
                   return date;
@@ -140,6 +143,14 @@ const NewMeeting: NextPage = () => {
               label="Deadline"
               type="datetime-local"
               {...meetingForm.register('deadline', { value: null, valueAsDate: true })}
+            />
+
+            <PublicSwitch
+              isForm
+              checked={meetingForm.watch('public')}
+              onCheckedChange={(checked) => {
+                meetingForm.setValue('public', checked);
+              }}
             />
 
             <TextArea

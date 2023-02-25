@@ -4,6 +4,7 @@ export const zMeetingCreateInput = z.object({
   title: z.string().min(1, { message: 'Must be at least 1 character long' }),
   description: z.string().max(300, { message: 'Must be 300 or less characters long' }).nullable(),
   deadline: z.date().nullable(),
+  public: z.boolean(),
   appointments: z
     .object({
       start: z.date(),
@@ -24,6 +25,7 @@ export const zMeetingUpdateInput = z.object({
     description: z.string().max(300, { message: 'Must be 300 or less characters long' }).optional(),
     deadline: z.date().optional(),
     closed: z.boolean().optional(),
+    public: z.boolean().optional(),
     participants: z
       .string()
       .email({ message: 'Every comma separated text must be an email' })

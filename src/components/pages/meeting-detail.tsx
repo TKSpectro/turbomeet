@@ -3,7 +3,9 @@ import { Answer } from '@prisma/client';
 import {
   CheckCircledIcon,
   CrossCircledIcon,
+  ExclamationTriangleIcon,
   GearIcon,
+  InfoCircledIcon,
   LockClosedIcon,
   LockOpen1Icon,
   MinusCircledIcon,
@@ -11,6 +13,7 @@ import {
   PersonIcon,
   QuestionMarkCircledIcon,
 } from '@radix-ui/react-icons';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -22,7 +25,8 @@ import { z } from 'zod';
 import type { RouterOutputs } from '../../utils/trpc';
 import { trpc } from '../../utils/trpc';
 import DateCardDetails from '../meeting/date-card-details';
-import { Button, Loading } from '../ui';
+import { PublicSwitch } from '../meeting/public-switch';
+import { Button, Input, Loading } from '../ui';
 import { Form, useZodForm } from '../ui/form';
 import { TextArea } from '../ui/textarea';
 
@@ -33,6 +37,7 @@ type Props = {
   user: RouterOutputs['user']['me'] | null | undefined;
   meeting: RouterOutputs['meeting']['getOne'] | null | undefined;
   isLoading: boolean;
+  isLoadingUser: boolean;
   refetchMeeting: () => Promise<unknown>;
 };
 
@@ -68,11 +73,35 @@ const AnswerIcon = ({ answer }: { answer?: string }) => {
   return <QuestionMarkCircledIcon className="h-5 w-5 text-gray-500" />;
 };
 
+const NotVerifiedTooltip = () => {
+  return (
+    <Tooltip.Provider>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <button>
+            <InfoCircledIcon className="h-6 w-6" />
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade select-none rounded-[4px] bg-white px-[15px] py-[10px] text-[15px] leading-none text-gray-900 shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity] dark:bg-gray-900 dark:text-white"
+            sideOffset={5}
+          >
+            This user&apos;s email is not verified
+            <Tooltip.Arrow className="fill-white dark:fill-gray-900" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  );
+};
+
 export function MeetingDetailPage({
   adminView,
   meeting,
   user: currentUser,
   isLoading,
+  isLoadingUser,
   refetchMeeting,
 }: Props) {
   const [, copyToClipboard] = useCopyToClipboard();
@@ -134,6 +163,13 @@ export function MeetingDetailPage({
     defaultValues: {},
   });
 
+  const newUserForm = useZodForm({
+    schema: z.object({
+      email: z.string().email({ message: 'Must be a valid email' }),
+    }),
+    mode: 'all',
+  });
+
   const { mutate: saveVotes, isLoading: saveVotesLoading } = trpc.meeting.vote.useMutation({
     onSuccess: () => {
       refetchMeeting();
@@ -141,11 +177,21 @@ export function MeetingDetailPage({
     },
   });
 
+  const { mutate: savePublicVotes, isLoading: savePublicVotesLoading } =
+    trpc.meetingPublic.vote.useMutation({
+      onSuccess: () => {
+        refetchMeeting();
+        setVotes({});
+      },
+    });
+
   const { mutate: updateMeeting } = trpc.meeting.update.useMutation({
     onSuccess: () => refetchMeeting(),
   });
 
   const [votes, setVotes] = useState<{ [appointmentId: string]: Answer }>({});
+
+  const [isPublic, setIsPublic] = useState<boolean>(meeting?.public || false);
 
   const VoteButton = ({
     vote,
@@ -155,7 +201,10 @@ export function MeetingDetailPage({
     disabled: boolean;
   }) => {
     return (
-      <div className="flex justify-center" style={{ width: columnWidth, minWidth: columnWidth }}>
+      <div
+        className="flex h-8 justify-center self-center"
+        style={{ width: columnWidth, minWidth: columnWidth }}
+      >
         <button
           aria-label={`Current Vote ${vote.answer}`}
           className={clsx('rounded-md px-3 py-1', {
@@ -240,6 +289,18 @@ export function MeetingDetailPage({
               </div>
             )}
 
+            {!adminView && !isLoadingUser && !currentUser && (
+              <div className="card p-0">
+                <div className="flex items-center justify-start gap-x-2 rounded-md bg-yellow-50 p-4 text-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-50">
+                  <ExclamationTriangleIcon className="h-6 w-6 shrink-0" />
+                  <span>
+                    You are currently visiting a public meeting without being logged in. To vote you
+                    can either login or enter your email address below and vote.
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="card mt-4 p-4">
               <div>
                 <div className="mb-2 flex justify-between text-gray-900 dark:text-gray-100">
@@ -281,6 +342,22 @@ export function MeetingDetailPage({
                 {meeting.description && (
                   <div className="mb-2 text-gray-800 dark:text-gray-200">{meeting.description}</div>
                 )}
+
+                {adminView && (
+                  <PublicSwitch
+                    checked={isPublic}
+                    onCheckedChange={(checked) => {
+                      setIsPublic(checked);
+
+                      updateMeeting({
+                        id: meeting.id,
+                        data: { public: checked },
+                      });
+                    }}
+                    className="mb-2"
+                  />
+                )}
+
                 {meeting.deadline && (
                   <div
                     className={clsx('mb-2 text-gray-900 dark:text-gray-100', {
@@ -337,7 +414,6 @@ export function MeetingDetailPage({
                         }}
                         fullWidth={false}
                         placeholder="Invite more participants. Add emails separated by commas"
-                        disableLabel
                         value={participantText}
                       />
                       <div className="ml-4 self-center">
@@ -438,8 +514,9 @@ export function MeetingDetailPage({
 
                   return (
                     <div key={participant.id} className="flex py-3">
-                      <div className="shrink-0" style={{ width: barWidth }}>
-                        {participant.name || participant.email}
+                      <div className="flex shrink-0 items-center" style={{ width: barWidth }}>
+                        <p className="mr-1 truncate">{participant.name || participant.email}</p>
+                        {!participant.emailVerified && <NotVerifiedTooltip />}
                       </div>
                       {participant.votes
                         .sort((a, b) => {
@@ -487,22 +564,70 @@ export function MeetingDetailPage({
                     </div>
                   );
                 })}
+                {!currentUser && !isLoadingUser && (
+                  <div className="flex py-3">
+                    <div className="shrink-0" style={{ width: barWidth }}>
+                      <Form form={newUserForm} onSubmit={() => null}>
+                        <Input type="email" label="Your email" {...newUserForm.register('email')} />
+                      </Form>
+                    </div>
+                    {sortedAppointments.map((appointment, i) => {
+                      let vote: { appointmentId: string; answer: Answer | undefined };
+                      if (votes[appointment.id] !== undefined) {
+                        vote = {
+                          appointmentId: appointment.id,
+                          answer: votes[appointment.id] as Answer,
+                        };
+                      } else {
+                        vote = {
+                          appointmentId: appointment.id,
+                          answer: undefined,
+                        };
+                      }
+
+                      return (
+                        <VoteButton
+                          key={i}
+                          vote={vote}
+                          disabled={
+                            meeting.closed ||
+                            (meeting.deadline && dayjs().isAfter(meeting.deadline)) ||
+                            false
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <Button
                 hidden={
                   meeting.closed || (meeting.deadline && dayjs().isAfter(meeting.deadline)) || false
                 }
-                disabled={saveVotesLoading || Object.keys(votes).length === 0}
+                disabled={
+                  savePublicVotesLoading ||
+                  saveVotesLoading ||
+                  Object.keys(votes).length === 0 ||
+                  (!currentUser && !newUserForm.formState.isValid)
+                }
                 onClick={() => {
                   const mappedVotes = Object.entries(votes).map(([appointmentId, answer]) => ({
                     appointmentId,
                     answer,
                   }));
 
-                  saveVotes({
-                    meetingId: meeting.id,
-                    votes: mappedVotes,
-                  });
+                  if (currentUser) {
+                    saveVotes({
+                      meetingId: meeting.id,
+                      votes: mappedVotes,
+                    });
+                  } else {
+                    savePublicVotes({
+                      meetingId: meeting.id,
+                      votes: mappedVotes,
+                      email: newUserForm.getValues().email,
+                    });
+                  }
                 }}
               >
                 Save Votes

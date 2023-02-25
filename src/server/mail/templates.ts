@@ -33,3 +33,15 @@ export const inviteNoAccount = ({
     text: `You have been invited to the meeting ${meetingTitle} by ${inviteeName}. As you currently have no account on this platform, you can create one by clicking on the following link: ${process.env.NEXTAUTH_URL}/auth/login. (Please use the same email address as you have been invited with.)`,
   };
 };
+
+export const votedPublicMeetingNoAccount = ({
+  meetingTitle,
+}: {
+  meetingTitle: string;
+}): MailTemplate => {
+  return {
+    html: ``,
+    subject: 'Please confirm your email',
+    text: `You have voted on a public meeting ${meetingTitle}. As you currently have no account on this platform, you need to confirm it by signing in on the following link: ${process.env.NEXTAUTH_URL}/auth/login. (Please use the same email address as you have been invited with.)`,
+  };
+};

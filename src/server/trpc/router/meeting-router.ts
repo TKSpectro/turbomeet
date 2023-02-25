@@ -4,7 +4,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { zMeetingCreateInput, zMeetingUpdateInput } from '../../../types/zod-meeting';
 import { sendMail } from '../../mail/client';
-import { protectedProcedure, router } from '../trpc';
+import { protectedProcedure, publicProcedure, router } from '../trpc';
 
 export const meetingRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -73,35 +73,39 @@ export const meetingRouter = router({
       orderBy: { title: 'asc' },
     });
   }),
-  getOne: protectedProcedure
-    .input(z.object({ token: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const meeting = await ctx.prisma.meeting.findFirst({
-        where: { id: input.token, participants: { some: { id: ctx.session.user.id } } },
-        include: {
-          appointments: {
-            where: { meetingId: input.token },
-            orderBy: { start: 'asc' },
-          },
-          participants: {
-            include: {
-              votes: {
-                where: { appointment: { meetingId: input.token } },
-              },
+  getOne: publicProcedure.input(z.object({ token: z.string() })).query(async ({ ctx, input }) => {
+    const meeting = await ctx.prisma.meeting.findFirst({
+      where: {
+        id: input.token,
+        OR: [
+          { public: true },
+          { participants: { some: { id: ctx.session?.user?.id || 'youhavetobeloggedin' } } },
+        ],
+      },
+      include: {
+        appointments: {
+          where: { meetingId: input.token },
+          orderBy: { start: 'asc' },
+        },
+        participants: {
+          include: {
+            votes: {
+              where: { appointment: { meetingId: input.token } },
             },
           },
         },
+      },
+    });
+
+    if (!meeting) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Meeting not found',
       });
+    }
 
-      if (!meeting) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Meeting not found',
-        });
-      }
-
-      return meeting;
-    }),
+    return meeting;
+  }),
   getOneAsAdmin: protectedProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -155,6 +159,7 @@ export const meetingRouter = router({
         title: input.title,
         description: input.description,
         deadline: deadline,
+        public: input.public,
         participants: {
           connect: [{ id: ctx.session.user.id }],
         },

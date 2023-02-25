@@ -16,7 +16,11 @@ const Admin: NextPage = () => {
     },
     {
       onError: () => {
-        router.push('/dashboard');
+        if (user) {
+          router.push('/dashboard');
+        } else {
+          router.push('/auth/login');
+        }
       },
     },
   );
@@ -27,7 +31,8 @@ const Admin: NextPage = () => {
     <MeetingDetailPage
       adminView={true}
       meeting={meeting}
-      isLoading={isLoading || isLoadingUser}
+      isLoading={isLoading}
+      isLoadingUser={isLoadingUser}
       user={user}
       refetchMeeting={refetch}
     />
