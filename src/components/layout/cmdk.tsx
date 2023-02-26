@@ -1,5 +1,6 @@
 import { SlashIcon } from '@radix-ui/react-icons';
 import { Command } from 'cmdk';
+import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -124,6 +125,13 @@ export function CmdK() {
             }}
           >
             Toggle theme
+          </Command.Item>
+          <Command.Item
+            onSelect={() => {
+              signOut({ callbackUrl: '/' });
+            }}
+          >
+            Sign out
           </Command.Item>
         </Command.List>
       </Command.Dialog>
