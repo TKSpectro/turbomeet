@@ -117,7 +117,7 @@ export function MeetingDetailPage({
   }
 
   const [didCopy, setDidCopy] = useState(false);
-  const [showShare, setShowShare] = useState(false);
+  const [showShare, setShowShare] = useState(true);
 
   const sortedAppointments: (Appointment & {
     votes: { [Answer.YES]: number; [Answer.NO]: number; [Answer.IFNECESSARY]: number };
@@ -262,8 +262,8 @@ export function MeetingDetailPage({
                   </button>
                 </div>
                 <div className="mb-2 text-gray-900 dark:text-gray-100">
-                  This link can be given to other participants to allow them to vote for an
-                  appointment
+                  This link can be given to other invited participants to allow them to vote for an
+                  appointment. If the meeting is marked as public anybody can vote with this link.
                 </div>
                 <div className="relative">
                   <input
