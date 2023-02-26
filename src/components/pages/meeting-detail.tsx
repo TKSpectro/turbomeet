@@ -12,6 +12,7 @@ import {
   PaperPlaneIcon,
   PersonIcon,
   QuestionMarkCircledIcon,
+  Share1Icon,
 } from '@radix-ui/react-icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import clsx from 'clsx';
@@ -116,10 +117,7 @@ export function MeetingDetailPage({
   }
 
   const [didCopy, setDidCopy] = useState(false);
-
-  const handleHide = () => {
-    console.error('Hide not implemented yet.');
-  };
+  const [showShare, setShowShare] = useState(false);
 
   const sortedAppointments: (Appointment & {
     votes: { [Answer.YES]: number; [Answer.NO]: number; [Answer.IFNECESSARY]: number };
@@ -248,14 +246,16 @@ export function MeetingDetailPage({
 
         {meeting && (
           <div>
-            {adminView && (
+            {adminView && showShare && (
               <div className="card p-4">
                 <div className="mb-1 flex items-center justify-between">
                   <div className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                     Share via link
                   </div>
                   <button
-                    onClick={handleHide}
+                    onClick={() => {
+                      setShowShare(false);
+                    }}
                     className="h-8 items-center justify-center rounded-md px-3 text-gray-600 hover:bg-gray-500/10 hover:text-gray-500 active:bg-gray-500/20 dark:text-gray-400"
                   >
                     Hide
@@ -315,25 +315,38 @@ export function MeetingDetailPage({
                     </Link>
                   )}
                   {adminView && (
-                    <Button
-                      small
-                      className="mb-4 flex"
-                      onClick={() => {
-                        updateMeeting({ id: meeting.id, data: { closed: !meeting.closed } });
-                      }}
-                    >
-                      {meeting.closed ? (
-                        <>
-                          <LockOpen1Icon className="mr-2 h-5 w-5" />
-                          Unlock
-                        </>
-                      ) : (
-                        <>
-                          <LockClosedIcon className="mr-2 h-5 w-5" />
-                          Lock
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex">
+                      <Button
+                        small
+                        className="mb-4 mr-2 flex"
+                        onClick={() => {
+                          setShowShare((prev) => !prev);
+                        }}
+                      >
+                        <Share1Icon className="mr-2 h-5 w-5" />
+                        Share
+                      </Button>
+
+                      <Button
+                        small
+                        className="mb-4 flex"
+                        onClick={() => {
+                          updateMeeting({ id: meeting.id, data: { closed: !meeting.closed } });
+                        }}
+                      >
+                        {meeting.closed ? (
+                          <>
+                            <LockOpen1Icon className="mr-2 h-5 w-5" />
+                            Unlock
+                          </>
+                        ) : (
+                          <>
+                            <LockClosedIcon className="mr-2 h-5 w-5" />
+                            Lock
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   )}
                 </div>
                 <div className="mb-2 text-gray-700 dark:text-gray-300">

@@ -30,7 +30,7 @@ export function Button({
           'bg-danger': variant === 'danger',
           'bg-warning': variant === 'warning',
           'bg-info': variant === 'info',
-          'bg-gray-300 text-gray-500': props.disabled,
+          'bg-gray-300 text-gray-500 dark:bg-gray-300 dark:text-gray-500': props.disabled,
         },
         props.className ? props.className : '',
       )}
